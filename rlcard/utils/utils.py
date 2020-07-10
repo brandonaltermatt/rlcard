@@ -18,7 +18,7 @@ def init_54_deck():
     ''' Initialize a standard deck of 52 cards, BJ and RJ
 
     Returns:
-        (list): Alist of Card object
+        (list): A list of Card object
     '''
     suit_list = ['S', 'H', 'D', 'C']
     rank_list = ['A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K']
@@ -27,6 +27,16 @@ def init_54_deck():
     res.append(Card('RJ', ''))
     return res
 
+def init_short_deck():
+    ''' Initialize a 6+ deck of 32 cards
+    A 6+ game is a deck with the 2s, 3s, 4s, and 5s removed
+
+    Returns:
+        (list): A list of Card object
+    '''
+    suit_list = ['S', 'H', 'D', 'C']
+    rank_list = ['A', '6', '7', '8', '9', 'T', 'J', 'Q', 'K']
+    return [Card(suit, rank) for suit in suit_list for rank in rank_list]
 
 def get_random_cards(cards, num, np_random=None):
     ''' Randomly get a number of chosen cards out of a list of cards
