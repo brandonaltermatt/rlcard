@@ -1,6 +1,11 @@
 import numpy as np
 
 class Hand:
+    RANK_TO_STRING = {2: "2", 3: "3", 4: "4", 5: "5", 6: "6",
+                      7: "7", 8: "8", 9: "9", 10: "T", 11: "J", 12: "Q", 13: "K", 14: "A"}
+    RANK_LOOKUP = "23456789TJQKA"
+    SUIT_LOOKUP = "SCDH"
+
     def __init__(self, all_cards):
         self.all_cards = all_cards # two hand cards + five public cards
         self.category = 0
@@ -13,10 +18,6 @@ class Hand:
         #cards after sort
         self.product = 1
         #cards’ type indicator
-        self.RANK_TO_STRING = {2: "2", 3: "3", 4: "4", 5: "5", 6: "6",
-                               7: "7", 8: "8", 9: "9", 10: "T", 11: "J", 12: "Q", 13: "K", 14: "A"}
-        self.RANK_LOOKUP = "23456789TJQKA"
-        self.SUIT_LOOKUP = "SCDH"
 
     def get_hand_five_cards(self):
         '''
