@@ -7,6 +7,11 @@ from rlcard.games.limitholdem import Judger
 from rlcard.games.limitholdem import Round
 
 class LimitholdemGame(object):
+    # Allow setting a custom Dealer or Judger class. This makes it easier to
+    # extend limitholdem, such as in shortlimitholdem.
+    DEALER_CLASS = Dealer
+    JUDGER_CLASS = Judger
+    
 
     def __init__(self, allow_step_back=False):
         ''' Initialize the class limitholdem Game
@@ -42,13 +47,13 @@ class LimitholdemGame(object):
                 (int): Current player's id
         '''
         # Initilize a dealer that can deal cards
-        self.dealer = Dealer(self.np_random)
+        self.dealer = self.DEALER_CLASS(self.np_random)
 
         # Initilize two players to play the game
         self.players = [Player(i, self.np_random) for i in range(self.num_players)]
 
         # Initialize a judger class which will decide who wins in the end
-        self.judger = Judger(self.np_random)
+        self.judger = self.JUDGER_CLASS(self.np_random)
 
         # Deal cards to each  player to prepare for the first round
         for i in range(2 * self.num_players):
