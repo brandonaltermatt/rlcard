@@ -176,7 +176,7 @@ class Hand:
         while (i - 5 >= 0):
             hand_to_check = ''.join(card[1] for card in Cards[i-5:i])
             is_straight = self.RANK_LOOKUP.find(hand_to_check)
-            if is_straight > 0:
+            if is_straight >= 0:
                 five_cards = [card for card in Cards[i-5:i]]
                 return five_cards
             i -= 1
