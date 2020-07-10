@@ -64,8 +64,7 @@ class ShortHand(Hand):
         Returns:
             (list): the straight cards
         '''
-        import pdb
-        pdb.set_trace()
+        # Ensures that aces count for low and high cards
         highest_card = cards[-1]
         lowest_card = cards[0]
         if highest_card[1] == 'A':
