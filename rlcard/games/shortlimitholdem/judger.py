@@ -1,2 +1,0 @@
-class ShortLimitHoldemJudger:
-    pass
