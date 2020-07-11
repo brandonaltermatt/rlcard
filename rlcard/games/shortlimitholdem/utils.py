@@ -6,7 +6,7 @@ class ShortHand(Hand):
     '''
     RANK_TO_STRING = {6: "6", 7: "7", 8: "8", 9: "9", 10: "T",
                       11: "J", 12: "Q", 13: "K", 14: "A"}
-    RANK_LOOKUP = "A6789TJQKA"
+    RANK_LOOKUP = "6789TJQKA"
     SUIT_LOOKUP = "SCDH"
 
     def evaluateHand(self):
@@ -57,27 +57,3 @@ class ShortHand(Hand):
             self.category = 1
             #High Card
             self.best_five = self._get_High_cards()
-
-    def _get_straight_cards(self, cards):
-        '''
-        Pick straight cards. Aces count as high and low.
-        Returns:
-            (list): the straight cards
-        '''
-        # Ensures that aces count for low and high cards
-        highest_card = cards[-1]
-        lowest_card = cards[0]
-        if highest_card[1] == 'A':
-            cards.insert(0, highest_card)
-        elif lowest_card[1] == 'A':
-            cards.append(lowest_card)
-
-        i = len(cards)
-        while (i - 5 >= 0):
-            hand_to_check = ''.join(card[1] for card in cards[i-5:i])
-            is_straight = self.RANK_LOOKUP.find(hand_to_check)
-            if is_straight >= 0:
-                five_cards = [card for card in cards[i-5:i]]
-                return five_cards
-            i -= 1
-        return []
