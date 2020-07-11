@@ -172,11 +172,12 @@ class Hand:
         highest_card = Cards[-1]
         if highest_card[1] == 'A':
             Cards.insert(0, highest_card)
+        high_and_low_ace_ranks = 'A' + self.RANK_LOOKUP
 
         i = len(Cards)
         while (i - 5 >= 0):
             hand_to_check = ''.join(card[1] for card in Cards[i-5:i])
-            is_straight = self.RANK_LOOKUP.find(hand_to_check)
+            is_straight = high_and_low_ace_ranks.find(hand_to_check)
             if is_straight >= 0:
                 five_cards = [card for card in Cards[i-5:i]]
                 return five_cards
