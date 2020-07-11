@@ -7,7 +7,6 @@ class ShortHand(Hand):
     RANK_TO_STRING = {6: "6", 7: "7", 8: "8", 9: "9", 10: "T",
                       11: "J", 12: "Q", 13: "K", 14: "A"}
     RANK_LOOKUP = "6789TJQKA"
-    SUIT_LOOKUP = "SCDH"
 
     def evaluateHand(self):
         """
