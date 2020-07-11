@@ -38,13 +38,13 @@ class ShortHand(Hand):
             self.category = 6
             #Full house
             self.best_five = self._get_Fullhouse_cards()
-        elif self._has_three():
+        elif self._has_straight(self.all_cards):
             self.category = 5
+            #Straight
+        elif self._has_three():
+            self.category = 4
             #Three of a Kind
             self.best_five = self._get_Three_of_a_kind_cards()
-        elif self._has_straight(self.all_cards):
-            self.category = 4
-            #Straight
         elif self._has_two_pairs():
             self.category = 3
             #Two Pairs
