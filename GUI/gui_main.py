@@ -1,5 +1,4 @@
 import tkinter as tk
-from pandas import DataFrame
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -15,6 +14,11 @@ class Agent:
         self.importString = importString
         self.displayName = displayName
 
+class Contest:
+    def __init__(self, game, agents):
+        self.game = game
+        self.agents = agents
+        #self.env =
 
 def getGames():
     importString = "TBD"
@@ -31,42 +35,47 @@ from rlcard.agents import RandomAgent
 from rlcard.agents.one_look_agent import OneLookAgent
 from rlcard.utils import set_global_seed, tournament
 
-env = rlcard.make('limit-holdem', config={'seed': 0, "game_player_num": 4})
-set_global_seed(0)
+# Set up agents and enviorments
+# Todo: Pull this information from unser input
+baseEnv = rlcard.make('limit-holdem')
+agentRando = RandomAgent(action_num=baseEnv.action_num)
+agentOneLook = OneLookAgent(action_num=baseEnv.action_num)
+mainAgent = agentOneLook
+otherAgents = [agentRando, agentRando]
 
-# Set up agents
-agentRando = RandomAgent(action_num=env.action_num)
-agentOneLook = OneLookAgent(action_num=env.action_num)
-env.set_agents([agentRando, agentOneLook])
+# Create a new game for each agent we are comparing agaisnt
+envs = []
+for agent in otherAgents:
+    env = rlcard.make('limit-holdem')
+    env.set_agents([mainAgent, agent])
+    envs.append(env)
+scores = [[] for _ in range(0,len(otherAgents))]
 
-# Test
-agentNames = ["Random1", "One Look"]
+# Create placeholder for our plot that will be generated below
 root = tk.Tk()
 fig, ax = plt.subplots()
-
 canvas = FigureCanvasTkAgg(fig, master=root)
 canvas.get_tk_widget().grid(column=0,row=1)
-scores = []
 
+# Runs when graph is initially shown
 def init():
     return ax,
 
+# Runs every iteration. i Is the iteration count
 def update(i):
-    newResults = tournament(env, 50)
-    scores.append(newResults)
-    # runningAverage = [0 for _ in range(0,len(xAxis))]
-    # for score in scores:
-    #     for i, agentScore in enumerate(score):
-    #         runningAverage[i] += agentScore
-    #print(runningAverage)
     ax.clear()
-    for i in range(0,len(scores[0])):
-        ax.plot(range(0,len(scores)), [s[i] for s in scores])
+    for gameNum, env in enumerate(envs):
+        newResults = tournament(env, 50)
+        scores[gameNum].append(newResults)
+        ax.plot(range(0,len(scores[gameNum])), [s[1] for s in scores[gameNum]])
+    ax.plot(range(0,len(scores[0])), [0 for _ in scores[0]])
+
     plt.xticks(rotation=45, ha='right')
     plt.subplots_adjust(bottom=0.30)
-    plt.title('TMP102 Temperature over Time')
-    plt.ylabel('Temperature (deg C)')
+    plt.title('Player Tester')
+    plt.ylabel('Earnings after 50 hands')
     return ax,
 
+# Puts updating the graph on a loop
 ani = FuncAnimation(fig, update, frames=range(0,10000), init_func=init, blit=True)  
 root.mainloop()
