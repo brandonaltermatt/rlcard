@@ -126,8 +126,7 @@ class CFRAgent():
 
         Args:
             obs (str): state_str
-            legal_actions (list): List of leagel actions
-            player_id (int): The current player
+            legal_actions (list): List of legal actions
             policy (dict): The used policy
 
         Returns:
