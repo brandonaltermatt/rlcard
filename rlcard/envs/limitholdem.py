@@ -9,6 +9,10 @@ from rlcard.games.limitholdem import Game
 class LimitholdemEnv(Env):
     ''' Limitholdem Environment
     '''
+    
+    # Allow setting a custom Game class. This makes it easier to
+    # extend limitholdem, such as in shortlimitholdem.
+    GAME_CLASS = Game
 
     def __init__(self, config):
         ''' Initialize the Limitholdem environment
