@@ -150,17 +150,8 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
             [0, 'check'], [1, 'check'],
             [0, 'raise'], [1, 'fold']
         ]
-        expected_result = np.array([
-            # Suits
-            0., 0., 0., 0., 0., 0., 0., 0., 0.,
-            # Bets
-            0., 0., 0., 0.,
-            0., 0., 0., 0.,
-            0., 0., 1., 0.,
-            0., 0., 0., 0.,
-            # Cards
-            0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0, 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
-        ])
+        expected_result = np.zeros(78)
+        expected_result[19] = 1
         result = e.encode(state, action_record)
         self.assertTrue(np.array_equal(expected_result[9:25], result[9:25]))  # Bets encoded correctly
 

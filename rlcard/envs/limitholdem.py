@@ -223,19 +223,18 @@ class LimitHoldemInfosetEncoder:
         # given the 2-player structure of the game this can be inferred.
         # Read the following post for more information:
         # https://github.com/jake-bickle/rlcard/issues/11#issuecomment-660538937
-        current_round_action_representation = {'raise_count': 0, 'last_better': 0}
-        round_actions = [current_round_action_representation]
+        round_actions = [{'raise_count': 0, 'last_better': 0} for _ in range(4)]
+        round_number = 0
         new_round = True
         for action in action_record:
             if action[1] == 'raise':
-                current_round_action_representation['raise_count'] += 1
-                current_round_action_representation['last_better'] = action[0]
+                round_actions[round_number]['raise_count'] += 1
+                round_actions[round_number]['last_better'] = action[0]
                 new_round = False
             elif new_round:
                 new_round = False
             else:
                 # The round is over
                 new_round = True
-                current_round_action_representation = {'raise_count': 0, 'last_better': 0}
-                round_actions.append(current_round_action_representation)
+                round_number += 1
         return round_actions
