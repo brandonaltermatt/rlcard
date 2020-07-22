@@ -1,6 +1,8 @@
 import unittest
+import numpy as np
 
 import rlcard
+from rlcard.envs.limitholdem import LimitHoldemInfosetEncoder
 from rlcard.agents.random_agent import RandomAgent
 from .determism_util import is_deterministic
 
@@ -73,6 +75,38 @@ class TestLimitholdemEnv(unittest.TestCase):
         env = rlcard.make('limit-holdem')
         _, player_id = env.reset()
         self.assertEqual(player_id, env.get_perfect_information()['current_player'])
+
+class TestLimitHoldemInfosetEncoder(unittest.TestCase):
+    def test_encode(self):
+        state = {'hand': ['S2', 'S3'], 'public_cards': ['S4', 'S5', 'S6', 'H3', 'H2']}
+        action_record = [
+            [0, 'call'], [1, 'check'], 
+            [0, 'check'], [1, 'check'],
+            [0, 'raise'], [1, 'call'],
+            [0, 'raise'], [1, 'raise'], [0, 'raise'], [1, 'raise'], [0, 'call']
+        ]
+        e = LimitHoldemInfosetEncoder()
+        expected_result = np.array([
+            # Suits
+            1.,
+            1., 0.,
+            0., 0.,
+            1., 1.,
+            0., 0.,
+            # Bets
+            0., 0., 0., 0.,
+            0., 0., 0., 0.,
+            0., 0., 1., 0.,
+            1., 0., 0., 1.,
+            # Cards
+            1., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+            0., 0., 1., 1., 1., 0., 0., 0., 0., 0., 0., 0., 0.,
+            0,
+            0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+            1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
+        ])
+        result = e.encode(state, action_record)
+        self.assertEqual(expected_result, result)
 
 if __name__ == '__main__':
     unittest.main()
