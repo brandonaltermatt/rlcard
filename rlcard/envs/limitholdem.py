@@ -121,7 +121,7 @@ class LimitHoldemInfosetEncoder:
 
     def __init__(self):
         self.amount_of_ranks = len(self.RANK_ORDER)
-        self.state_size = 25 + self.amount_of_ranks * 4
+        self.state_size = 26 + self.amount_of_ranks * 4
         self.state_shape = [self.state_size]
         self._encoded_vector = None
 
@@ -189,7 +189,8 @@ class LimitHoldemInfosetEncoder:
                 else:
                     second_pair_suit = suit
                 community_card_suits = [s for s in community_card_suits if s != suit]
-        self._encoded_vector[0] = 1 if hole_card_suits[0] == hole_card_suits[1] else 0
+        if hole_card_suits:
+            self._encoded_vector[0] = 1 if hole_card_suits[0] == hole_card_suits[1] else 0
         if first_pair_suit:
             self._encoded_vector[1] = 1
             self._encoded_vector[2] = 1 if first_pair_suit in hole_card_suits else 0
@@ -204,15 +205,17 @@ class LimitHoldemInfosetEncoder:
             self._encoded_vector[8] = 1 if trips_suit in hole_card_suits else 0
         
     def _encode_bets(self, action_record):
-        for round_action in self._infer_actions(action_record):
-            round_number = round_action[0]
-            number_of_bets = round_action[1]
-            number_of_bets_binary = [int(x) for x in bin(number_of_bets)[2:]]  # Thanks to mgilson @ https://stackoverflow.com/a/13557953/9041692
-            player_id_of_final_action = round_action[2]
-            index_offset = 9 + (round_number * 3)
-            self._encoded_vector[index_offset] = number_of_bets_binary[0]
-            self._encoded_vector[index_offset + 1] = number_of_bets_binary[1]
-            self._encoded_vector[index_offset + 2] = player_id_of_final_action
+        for round_number, round_action in enumerate(self._infer_actions(action_record)):
+            # Convert number of bets into a binary representation with 3 bits
+            raise_count_binary_string = bin(round_action["raise_count"])[2:]
+            raise_count_binary = [int(x) for x in raise_count_binary_string]  # Thanks to mgilson @ https://stackoverflow.com/a/13557953/9041692
+            for _ in range(3 - len(raise_count_binary)):
+                raise_count_binary.insert(0, 0)  # Forces the binary to have 3 bits
+            index_offset = 9 + (round_number * 4)
+            self._encoded_vector[index_offset] = raise_count_binary[0]
+            self._encoded_vector[index_offset + 1] = raise_count_binary[1]
+            self._encoded_vector[index_offset + 2] = raise_count_binary[2]
+            self._encoded_vector[index_offset + 3] = round_action["last_better"]
 
     @staticmethod
     def _infer_actions(action_record):
@@ -220,18 +223,19 @@ class LimitHoldemInfosetEncoder:
         # given the 2-player structure of the game this can be inferred.
         # Read the following post for more information:
         # https://github.com/jake-bickle/rlcard/issues/11#issuecomment-660538937
-        round_actions = []
+        current_round_action_representation = {'raise_count': 0, 'last_better': 0}
+        round_actions = [current_round_action_representation]
         new_round = True
-        current_round = 0
-        current_amount_of_bets = 0
         for action in action_record:
             if action[1] == 'raise':
-                current_amount_of_bets += 1
-            if action[1] == 'check' or action[1] == 'call':
-                if new_round:
-                    new_round = False
-                else:
-                    round = [current_round, current_amount_of_bets, action[0]]
-                    current_round += 1
-                    current_amount_of_bets = 0
+                current_round_action_representation['raise_count'] += 1
+                current_round_action_representation['last_better'] = action[0]
+                new_round = False
+            elif new_round:
+                new_round = False
+            else:
+                # The round is over
+                new_round = True
+                current_round_action_representation = {'raise_count': 0, 'last_better': 0}
+                round_actions.append(current_round_action_representation)
         return round_actions
