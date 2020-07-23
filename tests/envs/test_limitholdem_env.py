@@ -12,7 +12,7 @@ class TestLimitholdemEnv(unittest.TestCase):
     def test_reset_and_extract_state(self):
         env = rlcard.make('limit-holdem')
         state, _ = env.reset()
-        self.assertEqual(state['obs'].size, 72)
+        self.assertEqual(state['obs'].size, 78)
         for action in state['legal_actions']:
             self.assertLess(action, env.action_num)
 
