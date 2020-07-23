@@ -170,39 +170,32 @@ class LimitHoldemInfosetEncoder:
     def _encode_card_suits(self, player_state):
         hole_card_suits = [card[0] for card in player_state['hand']]
         community_card_suits = [card[0] for card in player_state['public_cards']]
-        suits = 'SDCH'
-        quads_suit = None
-        trips_suit = None
-        first_pair_suit = None
-        second_pair_suit = None
+        suits = 'CDHS'
+        pair_suits = []
         for suit in suits:
             suit_occurances = community_card_suits.count(suit)
             if suit_occurances == 4:
                 quads_suit = suit
-                community_card_suits = [s for s in community_card_suits if s != suit]
+                self._encoded_vector[7] = 1
+                self._encoded_vector[8] = 1 if suit in hole_card_suits else 0
             if suit_occurances == 3:
-                trips_suit = suit
-                community_card_suits = [s for s in community_card_suits if s != suit]
+                self._encoded_vector[5] = 1
+                self._encoded_vector[6] = 1 if suit in hole_card_suits else 0
             if suit_occurances == 2:
-                if first_pair_suit is None:
-                    first_pair_suit = suit
-                else:
-                    second_pair_suit = suit
-                community_card_suits = [s for s in community_card_suits if s != suit]
-        if hole_card_suits:
-            self._encoded_vector[0] = 1 if hole_card_suits[0] == hole_card_suits[1] else 0
-        if first_pair_suit:
+                pair_suits.append(suit)
+            community_card_suits = [s for s in community_card_suits if s != suit]
+        self._encoded_vector[0] = 1 if hole_card_suits[0] == hole_card_suits[1] else 0
+        
+        if len(pair_suits) == 1:
             self._encoded_vector[1] = 1
-            self._encoded_vector[2] = 1 if first_pair_suit in hole_card_suits else 0
-        if second_pair_suit:
+            self._encoded_vector[2] = 1 if pair_suits[0] in hole_card_suits else 0
+        elif len(pair_suits) == 2:
+            self._encoded_vector[1] = 1
             self._encoded_vector[3] = 1
-            self._encoded_vector[4] = 1 if second_pair_suit in hole_card_suits else 0
-        if trips_suit:
-            self._encoded_vector[5] = 1
-            self._encoded_vector[6] = 1 if trips_suit in hole_card_suits else 0
-        if quads_suit:
-            self._encoded_vector[7] = 1
-            self._encoded_vector[8] = 1 if trips_suit in hole_card_suits else 0
+            # The logic here ensures bit 4 is activated only if bit 2 is
+            matching_suits = map(lambda s: s in hole_card_suits, pair_suits)
+            self._encoded_vector[2] = 1 if any(matching_suits) else 0
+            self._encoded_vector[4] = 1 if all(matching_suits) else 0
         
     def _encode_bets(self, action_record):
         for round_number, round_action in enumerate(self._infer_actions(action_record)):

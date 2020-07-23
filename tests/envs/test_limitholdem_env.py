@@ -155,6 +155,24 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
         result = e.encode(state, action_record)
         self.assertTrue(np.array_equal(expected_result[9:25], result[9:25]))  # Bets encoded correctly
 
+    def test_encode_suits(self):
+        e = LimitHoldemInfosetEncoder()
+        state = {'hand': ['D2', 'D3'], 'public_cards': ['S4', 'S5', 'S6', 'H3', 'H4']}
+        expected_result = np.zeros(78)
+        expected_result[0] = 1
+        expected_result[1] = 1
+        expected_result[5] = 1
+        result = e.encode(state, [])
+        self.assertTrue(np.array_equal(expected_result[:9], result[:9]))  # Bets encoded correctly
+
+        state = {'hand': ['H2', 'D3'], 'public_cards': ['S4', 'S5', 'D6', 'H3', 'H4']}
+        expected_result = np.zeros(78)
+        expected_result[1] = 1
+        expected_result[2] = 1
+        expected_result[3] = 1
+        result = e.encode(state, [])
+        self.assertTrue(np.array_equal(expected_result[:9], result[:9]))  # Bets encoded correctly
+
 
 if __name__ == '__main__':
     unittest.main()
