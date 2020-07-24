@@ -30,7 +30,7 @@ class LimitHoldemInfosetEncoder:
         '''
         self._encoded_vector = np.zeros(self.state_size)
         self._encode_cards(player_state)
-        self._encode_bets(action_record)
+        self._encode_bets(player_state['player_id'], action_record)
         return self._encoded_vector
 
     def _encode_cards(self, player_state):
@@ -88,7 +88,7 @@ class LimitHoldemInfosetEncoder:
             self._encoded_vector[2] = 1 if any(matching_suits) else 0
             self._encoded_vector[4] = 1 if all(matching_suits) else 0
         
-    def _encode_bets(self, action_record):
+    def _encode_bets(self, player_id, action_record):
         for round_number, round_action in enumerate(self._infer_actions(action_record)):
             # Convert number of bets into a binary representation with 3 bits
             raise_count_binary_string = bin(round_action["raise_count"])[2:]
@@ -96,10 +96,11 @@ class LimitHoldemInfosetEncoder:
             for _ in range(3 - len(raise_count_binary)):
                 raise_count_binary.insert(0, 0)  # Forces the binary to have 3 bits
             index_offset = 9 + (round_number * 4)
+            last_better_was_opponent = 1 if round_action['last_better'] is not None and round_action['last_better'] != player_id else 0
             self._encoded_vector[index_offset] = raise_count_binary[0]
             self._encoded_vector[index_offset + 1] = raise_count_binary[1]
             self._encoded_vector[index_offset + 2] = raise_count_binary[2]
-            self._encoded_vector[index_offset + 3] = round_action["last_better"]
+            self._encoded_vector[index_offset + 3] = last_better_was_opponent
 
     @staticmethod
     def _infer_actions(action_record):
@@ -107,7 +108,7 @@ class LimitHoldemInfosetEncoder:
         # given the 2-player structure of the game this can be inferred.
         # Read the following post for more information:
         # https://github.com/jake-bickle/rlcard/issues/11#issuecomment-660538937
-        round_actions = [{'raise_count': 0, 'last_better': 0} for _ in range(4)]
+        round_actions = [{'raise_count': 0, 'last_better': None} for _ in range(4)]
         round_number = 0
         new_round = True
         for action in action_record:

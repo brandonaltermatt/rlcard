@@ -78,7 +78,7 @@ class TestLimitholdemEnv(unittest.TestCase):
 
 class TestLimitHoldemInfosetEncoder(unittest.TestCase):
     def test_encode_full_game(self):
-        state = {'hand': ['S2', 'S3'], 'public_cards': ['S4', 'S5', 'S6', 'H3', 'H2']}
+        state = {'hand': ['S2', 'S3'], 'public_cards': ['S4', 'S5', 'S6', 'H3', 'H2'], 'player_id': 0}
         action_record = [
             [0, 'call'], [1, 'check'],
             [0, 'check'], [1, 'check'],
@@ -111,7 +111,7 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
         self.assertTrue(np.array_equal(expected_result[25:], result[25:]))  # Ranks encoded correctly
 
     def test_encode_partial_game(self):
-        state = {'hand': ['S2', 'S3'], 'public_cards': ['S4', 'S5', 'S6', 'H3']}
+        state = {'hand': ['S2', 'S3'], 'public_cards': ['S4', 'S5', 'S6', 'H3'], 'player_id': 1}
         action_record = [
             [0, 'call'], [1, 'check'],
             [0, 'check'], [1, 'check'],
@@ -128,7 +128,7 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
             # Bets
             0., 0., 0., 0.,
             0., 0., 0., 0.,
-            0., 0., 1., 0.,
+            0., 0., 1., 1.,
             0., 0., 0., 0.,
             # Cards
             1., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
@@ -144,7 +144,7 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
 
     def test_encode_with_fold_action(self):
         e = LimitHoldemInfosetEncoder()
-        state = {'hand': [], 'public_cards': []}
+        state = {'hand': [], 'public_cards': [], 'player_id': 0}
         action_record = [
             [0, 'call'], [1, 'check'], 
             [0, 'check'], [1, 'check'],
@@ -157,7 +157,7 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
 
     def test_encode_suits(self):
         e = LimitHoldemInfosetEncoder()
-        state = {'hand': ['D2', 'D3'], 'public_cards': ['S4', 'S5', 'S6', 'H3', 'H4']}
+        state = {'hand': ['D2', 'D3'], 'public_cards': ['S4', 'S5', 'S6', 'H3', 'H4'], 'player_id': 0}
         expected_result = np.zeros(78)
         expected_result[0] = 1
         expected_result[1] = 1
@@ -165,7 +165,7 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
         result = e.encode(state, [])
         self.assertTrue(np.array_equal(expected_result[:9], result[:9]))  # Bets encoded correctly
 
-        state = {'hand': ['H2', 'D3'], 'public_cards': ['S4', 'S5', 'D6', 'H3', 'H4']}
+        state = {'hand': ['H2', 'D3'], 'public_cards': ['S4', 'S5', 'D6', 'H3', 'H4'], 'player_id': 0}
         expected_result = np.zeros(78)
         expected_result[1] = 1
         expected_result[2] = 1
