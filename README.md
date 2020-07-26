@@ -205,3 +205,8 @@ Contribution to this project is greatly appreciated! Please create an issue for 
 
 ## Acknowledgements
 We would like to thank JJ World Network Technology Co.,LTD for the generous support and all the contributions from the community contributors.
+
+## License
+This work is released under the MIT License.
+Please see the file `LICENSE.md` in this distribution for
+license terms.
