@@ -112,6 +112,8 @@ class LimitHoldemInfosetEncoder:
         round_number = 0
         new_round = True
         for action in action_record:
+            if round_number == 4:
+                break
             if action[1] == 'raise':
                 round_actions[round_number]['raise_count'] += 1
                 round_actions[round_number]['last_better'] = action[0]
