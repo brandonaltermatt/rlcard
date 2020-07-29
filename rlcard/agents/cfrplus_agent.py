@@ -1,25 +1,50 @@
 import numpy as np
-import collections
-
-import os
-import pickle
-
-from rlcard.utils.utils import *
 from rlcard.agents.cfr_agent import CFRAgent
 
 class CFRPlusAgent(CFRAgent):
-    ''' Implement CFR+ algorithm
-        Modified CFRAgent (vanilla CFR) with various optimizations
+    ''' 
+        WARNING: WORK IN PROGRESS, PROBABLY BUGGY
+        
+        Modified CFRAgent ('vanilla' CFR) with various optimizations
+        
+        CFR+
+        https://arxiv.org/abs/1407.5042
+        
+        DCFR
+        https://arxiv.org/pdf/1809.04040.pdf
+    '''
+    
+    ALPHA = 1.5
+    BETA = 0
+    GAMMA = 2
+    ''' Parameters for Discounted CFR (DCFR)
+    
+        On updating each action's regret, on iteration t:
+        - Accumulated positive regret is multiplied by:
+            t ^ ALPHA / (t ^ ALPHA + 1)
+            
+        - Accumulated negative regret is multiplied by:
+            t ^ BETA / (t ^ BETA+ 1)
+            
+        - Contribution to average policy is multiplied by:
+            (t / t + 1) ^ GAMMA
+            
+        Default parameters (generally perform well in most games): 1.5, 0, 2
+        
+        Linear CFR (LCFR) is equivalent to DCFR(1,1,1)
+        LCFR performs best in games with the potential for extremely large
+        mistakes, such as no limit poker
+        
+        CFR+ is equivalent to DCFR(inf,-inf,2)
     '''
     
     TRAINING_DELAY = 0 
-    ''' Complete this many iterations before beginning updates to the average policy
+    ''' Complete this many iterations before beginning updates to the average 
+    policy. Used in some CFR+ implementations. Generally not used with DCFR.
     '''
-
-    def __init__(self, env, model_path='./cfrplus_model'):
-        ''' Initilize Agent
-        '''        
-        super().__init__(env, model_path='./cfrplus_model')
+    
+    def __init__(self, env, model_path='./cfr+_model'):
+        super().__init__(env, model_path='./cfr+_model')
 
     def traverse_tree(self, probs, player_id):
         ''' Traverse the game tree, update the regrets
@@ -71,14 +96,17 @@ class CFRPlusAgent(CFRAgent):
             action_prob = action_probs[action]
             regret = counterfactual_prob * (action_utilities[action][current_player]
                     - player_state_utility)
-            self.regrets[obs][action] += regret
-          
-        #CFRPlus modifications
-            if self.regrets[obs][action] < 0:
-                self.regrets[obs][action] *= 0.5
+            
+            
+        # DCFR weight adjusting
+            if self.regrets[obs][action] > 0:
+                self.regrets[obs][action] *= (self.iteration ** self.ALPHA) / (self.iteration ** self.ALPHA + 1)
             else:
-                self.regrets[obs][action] *= (self.iteration ** 1.5) / (self.iteration ** 1.5 + 1)
-            if TRAINING_DELAY <= self.iteration:
-                self.average_policy[obs][action] += ((self.iteration ** 2) / (self.iteration ** 2 + 1)) * player_prob * action_prob
-                       
+                self.regrets[obs][action] *= (self.iteration ** self.BETA) / (self.iteration ** self.BETA + 1)
+            if self.TRAINING_DELAY <= self.iteration:
+                self.average_policy[obs][action] += ((self.iteration / (self.iteration + 1)) ** 2) * player_prob * action_prob
+            
+            self.regrets[obs][action] += regret
+            
+            
         return state_utility
