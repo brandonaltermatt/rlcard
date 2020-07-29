@@ -1,3 +1,28 @@
+# Auto-Cardshark: Experimental Poker AI for Short-deck Limit Holdem
+This is an experimental learning project by students at Portland State University, using and exapnding the RLCard toolkit to develop and test learning algorthims for a poker game. 
+Team members: Johnny Neckar, Jacob Bickle, Joseph Devlin, Yubin Fan, Brandon Altermatt
+
+# Short-deck Limit Holdem Implementation
+The toolkit has been expanded to include a new poker game, short-deck holdem. Short-deck is a holdem variation which uses a 36 card deck instead of a full 52 card deck. The smaller deck size significantly reduces complexity of the game tree, making it a useful candidate for running experimention on poker games with limited computational resources. In contrast to toy poker games such like Kuhn and Leduc, short-deck retains the strategic depth and complexity of holdem, while still significantly reducing computational cost by shrinking the state-space.
+
+
+# Graphical Interface for Running Experiments
+
+
+
+
+
+# Expansion of CFR Algorithm
+Counterfactional Regret Minimization is a family of learning algorithms for use in games with imperfect information. Traditional learning algorithms such as Mini-max and Q-Learning are unstable in multiagent games with imperfect information. CFR was the first algorithm to achieve super-human performance in full scale poker games, developing a strategy that is capable of bluffing and deception and robust to opponents which are actively attempting to exploit it. It is however very computationally expensive in large poker games (Cepheus, the agent which developed an approximate solution to 2 player limitholdem, trained for 68 days on 4800 CPUs). Much research has been done on developing modifications and optimizations to the original CFR algorithm. The RLCard toolkit includes an implementation of vanilla-CFR, which the project attempts to expand with some of these improvements.
+
+
+# Additional Algorithm Development
+
+
+
+
+The full readme for the RLCard toolkit is below.
+
 # RLCard: A Toolkit for Reinforcement Learning in Card Games
 <img width="500" src="./docs/imgs/logo.jpg" alt="Logo" />
 
@@ -205,3 +230,8 @@ Contribution to this project is greatly appreciated! Please create an issue for 
 
 ## Acknowledgements
 We would like to thank JJ World Network Technology Co.,LTD for the generous support and all the contributions from the community contributors.
+
+## License
+This work is released under the MIT License.
+Please see the file `LICENSE.md` in this distribution for
+license terms.
