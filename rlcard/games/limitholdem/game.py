@@ -193,6 +193,7 @@ class LimitholdemGame(object):
         chips = [self.players[i].in_chips for i in range(self.num_players)]
         legal_actions = self.get_legal_actions()
         state = self.players[player].get_state(self.public_cards, chips, legal_actions)
+        state['player_id'] = player
         state['raise_nums'] = self.history_raise_nums
 
         return state
