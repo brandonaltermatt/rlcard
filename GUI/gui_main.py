@@ -4,32 +4,6 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-class Game:
-    def __init__(self, importString, displayName):
-        self.importString = importString
-        self.displayName = displayName
-
-class Agent:
-    def __init__(self, importString, displayName):
-        self.importString = importString
-        self.displayName = displayName
-
-class Contest:
-    def __init__(self, game, agents):
-        self.game = game
-        self.agents = agents
-        #self.env =
-
-def getGames():
-    importString = "TBD"
-    displayName = "Holdem"
-    return [Game(importString , displayName)]
-
-def getAgents(game):
-    importString = "TBD"
-    displayName = "randomAgent"
-    return [Agent(importString , displayName)]
-
 def setAgent():
     pass
 def setAgainstAgent():
@@ -80,12 +54,14 @@ def update(i):
     global acumScores
     ax.clear()
     for gameNum, env in enumerate(envs):
-        newResults = tournament(env, 50)
+        newResults = tournament(env, 1)
+        print(newResults)
         scores[gameNum].append(newResults)
         acumScores[gameNum] += newResults[1]
         line, = ax.plot(range(0,len(scores[gameNum])), [s[1] for s in scores[gameNum]])
         line.set_label(otherAgentsName[gameNum])
         ax.legend()
+        
     line, = ax.plot(range(0,len(scores[0])), [0 for _ in scores[0]])
     line.set_label(mainAgentName)
     ax.legend()
@@ -106,7 +82,7 @@ def update2(i):
 
 # Puts updating the graph on a loop
 aniLineChart = FuncAnimation(fig, update, frames=range(0,10000), init_func=init, blit=True)
-aniLineChart = FuncAnimation(fig2, update2, frames=range(0,10000), init_func=init2, blit=True)
+aniLineChart2 = FuncAnimation(fig2, update2, frames=range(0,10000), init_func=init2, blit=True)
 
 agentList = tk.Listbox(root)
 for item in ["One Look", "Random"]:
