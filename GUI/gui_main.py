@@ -35,6 +35,7 @@ acumScores = [0 for _ in range(0,len(otherAgents))]
 
 # Create placeholder for our plot that will be generated below
 root = tk.Tk()
+
 fig, ax = plt.subplots()
 fig.suptitle("Rewards - 50 games played")
 canvas = FigureCanvasTkAgg(fig, master=root)
@@ -81,8 +82,11 @@ def update2(i):
     return ax2,
 
 # Puts updating the graph on a loop
-aniLineChart = FuncAnimation(fig, update, frames=range(0,10000), init_func=init, blit=True)
-aniLineChart2 = FuncAnimation(fig2, update2, frames=range(0,10000), init_func=init2, blit=True)
+def startGame():
+    aniLineChart = FuncAnimation(fig, update, frames=range(0,10000), init_func=init, blit=True)
+    aniLineChart = FuncAnimation(fig2, update2, frames=range(0,10000), init_func=init2, blit=True)
+
+tk.Button(root, text="Start Game", command=startGame).grid(column=3,row=1)
 
 agentList = tk.Listbox(root)
 for item in ["One Look", "Random"]:
@@ -100,6 +104,6 @@ tk.Button(root, text="Pick A Game", command=setAgent).grid(column=2,row=2)
 statusString = tk.StringVar()
 statusLabel = tk.Label(root, textvariable=statusString)
 statusString.set("Game: Limit Holdem\n\nMain Agent:\nOne Look\n\nAgainst Agents:\nRandom Agent\nRandom Agent")
-statusLabel.grid(column=3,row=1)
+statusLabel.grid(column=3,row=2)
 
 root.mainloop()
