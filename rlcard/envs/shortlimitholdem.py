@@ -4,10 +4,13 @@ from rlcard.games.shortlimitholdem import Game
 
 class ShortLimitHoldemInfosetEncoder(LimitHoldemInfosetEncoder):
     RANK_ORDER = '6789TJQKA'
-    
-class MiniShortEncoder(NoFlushEncoder):
-    RANK_ORDER = '6789TJQKA'    
+
+class ShortLimitHoldemNoFlushEncoder(NoFlushEncoder):
+    RANK_ORDER = '6789TJQKA'
 
 class ShortlimitholdemEnv(LimitholdemEnv):
-    ENCODER = MiniShortEncoder()
+    INFOSET_ENCODERS = {
+        'default': ShortLimitHoldemInfosetEncoder(),
+        'no-flush': ShortLimitHoldemNoFlushEncoder(),
+    }
     GAME_CLASS = Game
