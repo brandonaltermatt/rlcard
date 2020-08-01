@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 
 import rlcard
-from rlcard.envs.limitholdem import LimitHoldemInfosetEncoder
+from rlcard.envs._limitholdem_infoset_encoders import LimitHoldemInfosetEncoder, NoFlushEncoder
 from rlcard.agents.random_agent import RandomAgent
 from .determism_util import is_deterministic
 
@@ -75,6 +75,29 @@ class TestLimitholdemEnv(unittest.TestCase):
         env = rlcard.make('limit-holdem')
         _, player_id = env.reset()
         self.assertEqual(player_id, env.get_perfect_information()['current_player'])
+
+    def test_differing_extract_state_obs(self):
+        env = rlcard.make('limit-holdem', config={'player_infoset_encoders': ['default', 'no-flush']})
+        sample_player0_state = {
+            'player_id': 0,
+            'raws_obs': [],
+            'legal_actions': ['call', 'raise', 'fold'],
+            'action_record': [],
+            'hand': ['S3', 'S4'],
+            'public_cards': [],
+        }
+        sample_player1_state = {
+            'player_id': 1,
+            'raws_obs': [],
+            'legal_actions': ['call', 'raise', 'fold'],
+            'action_record': [],
+            'hand': ['S6', 'S5'],
+            'public_cards': [],
+        }
+        player0_obs = env._extract_state(sample_player0_state)["obs"]
+        player1_obs = env._extract_state(sample_player1_state)["obs"]
+        self.assertEqual(len(player0_obs), 78)
+        self.assertEqual(len(player1_obs), 63)
 
 class TestLimitHoldemInfosetEncoder(unittest.TestCase):
     def test_encode_full_game(self):
@@ -172,6 +195,10 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
         expected_result[3] = 1
         result = e.encode(state, [])
         self.assertTrue(np.array_equal(expected_result[:9], result[:9]))  # Bets encoded correctly
+
+# TODO Implement test cases
+class TestNoFlushEncoder(unittest.TestCase):
+    pass
 
 
 if __name__ == '__main__':
