@@ -11,21 +11,42 @@ from rlcard.envs._limitholdem_infoset_encoders import LimitHoldemInfosetEncoder,
 class LimitholdemEnv(Env):
     ''' Limitholdem Environment
     '''
-    ENCODER = LimitHoldemInfosetEncoder()
+    INFOSET_ENCODERS = {
+        'default': LimitHoldemInfosetEncoder(),
+        'no-flush': NoFlushEncoder(),
+    }
     GAME_CLASS = Game
 
     def __init__(self, config):
         ''' Initialize the Limitholdem environment
+
+            config (dict): A config dictionary. An addition to the fields mentioned in env.__init__ there is:
+                player_infoset_encoders (array of length 2): A string array of infoset encoder names, where each index
+                    represents the player id of the player who gets said infoset encoder.
+                    I.E. ['default', 'no-flush']
+                    player 0 obs is encoded by the 'default' infoset encoding scheme
+                    player 1 obs is encoded by the 'no-flush' infoset encoding scheme
         '''
         self.name = 'limit-holdem'
         if 'raise_num' in config:
             self.game = self.GAME_CLASS(allowed_raises=config['raise_num'])
         else:
             self.game = self.GAME_CLASS()
-        config['record_action'] = True  # The encoder requires details on bets
+        config['record_action'] = True  # LimitHoldemInfosetEncoder requires details on bets
+        self.player_infoset_encoders = []
+        self._init_infoset_encoders(config)
         super().__init__(config)
         self.actions = ['call', 'raise', 'fold', 'check']
-        self.state_shape = self.ENCODER.state_shape
+
+    def _init_infoset_encoders(self, config):
+        if 'player_infoset_encoders' in config.keys():
+            if len(config['player_infoset_encoders']) != 2:
+                raise ValueError("Config item \'player_infoset_encoders\' should be an array of length 2")
+            self.player_infoset_encoders.append(self.INFOSET_ENCODERS[config['player_infoset_encoders'][0]])
+            self.player_infoset_encoders.append(self.INFOSET_ENCODERS[config['player_infoset_encoders'][1]])
+        else:
+            default = self.INFOSET_ENCODERS['default']
+            self.player_infoset_encoders = [default, default]
 
     def _get_legal_actions(self):
         ''' Get all leagal actions
@@ -48,7 +69,8 @@ class LimitholdemEnv(Env):
 
         legal_actions = [self.actions.index(a) for a in state['legal_actions']]
         extracted_state['legal_actions'] = legal_actions
-        extracted_state['obs'] = self.ENCODER.encode(state, self.action_recorder)
+        infoset_encoder = self.player_infoset_encoders[state['player_id']]
+        extracted_state['obs'] = infoset_encoder.encode(state, self.action_recorder)
 
         if self.allow_raw_data:
             extracted_state['raw_obs'] = state
@@ -104,3 +126,8 @@ class LimitholdemEnv(Env):
         state['current_player'] = self.game.game_pointer
         state['legal_actions'] = self.game.get_legal_actions()
         return state
+
+    def get_state_shape(self, player_id):
+        ''' Gets the state shape of the infoset encoder being used by player_id
+        '''
+        return self.player_infoset_encoders[player_id].state_shape
