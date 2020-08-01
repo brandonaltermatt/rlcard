@@ -42,7 +42,7 @@ with tf.Session() as sess:
         agent = NFSPAgent(sess,
                           scope='nfsp' + str(i),
                           action_num=env.action_num,
-                          state_shape=env.state_shape,
+                          state_shape=env.get_state_shape(i),
                           hidden_layers_sizes=[512,512],
                           anticipatory_param=0.1,
                           min_buffer_size_to_learn=memory_init_size,
