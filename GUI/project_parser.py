@@ -36,6 +36,8 @@ def makeGame(agents, gameName):
     env.set_agents(agents)
     return env
 
+# Display the lists of games and agents
+
 games = getGames()
 print(games)
 agents = getAgents()

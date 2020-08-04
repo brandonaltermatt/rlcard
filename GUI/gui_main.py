@@ -1,24 +1,83 @@
 import tkinter as tk
 import numpy as np
 import matplotlib.pyplot as plt
+import GUI.project_parser as parser
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
-def setAgent():
-    pass
-def setAgainstAgent():
-    pass
 
 import rlcard
 from rlcard.agents import RandomAgent
 from rlcard.agents.one_look_agent import OneLookAgent
 from rlcard.utils import set_global_seed, tournament
 
+envName = ""
+agentName = ""
+againstAgentName = ""
+
+def setGame(game):
+    envName = game
+    gameString.set("Game: " + envName + "\n\n")
+def setAgent(agent):
+    agentName = agent
+    agentString.set("Main Agent: " + agentName + "\n\n")
+def setAgainstAgent(againstAgent):
+    againstAgentName = againstAgent
+    againstAgentString.set("Against Agents: " + againstAgentName)
+
+
+# Create placeholder for our plot that will be generated below
+root = tk.Tk()
+
+fig, ax = plt.subplots()
+fig.suptitle("Rewards - 50 games played")
+canvas = FigureCanvasTkAgg(fig, master=root)
+canvas.get_tk_widget().grid(column=0,row=4, columnspan=2)
+
+fig2, ax2 = plt.subplots()
+fig2.suptitle("Accumulative rewards")
+canvas2 = FigureCanvasTkAgg(fig2, master=root)
+canvas2.get_tk_widget().grid(column=2,row=4)
+
+# List the game modes
+gameListBox = tk.Listbox(root)
+gamesList = parser.getGames()
+for game in gamesList:
+    gameListBox.insert(tk.END, game)
+
+gameListBox.grid(column=0,row=1)
+tk.Button(root, text="Pick A Game", command= lambda: setGame(gameListBox.get(gameListBox.curselection()))).grid(column=0,row=2)
+
+# List the agent options
+agentListBox = tk.Listbox(root)
+agentsList = parser.getAgents()
+agentsNames = parser.getAgentNames(agentsList)
+for name in agentsList:
+    agentListBox.insert(tk.END, name)
+
+agentListBox.grid(column=2,row=1)
+tk.Button(root, text="PickMainAgent", command= lambda: setAgent(agentListBox.get(agentListBox.curselection()))).grid(column=2,row=2)
+tk.Button(root, text="AddAgainstAgents", command= lambda: setAgainstAgent(agentListBox.get(agentListBox.curselection()))).grid(column=2,row=3)
+
+# Display the information about the current game
+gameString = tk.StringVar()
+agentString = tk.StringVar()
+againstAgentString = tk.StringVar()
+
+gameLabel = tk.Label(root, textvariable=gameString)
+agentLabel = tk.Label(root, textvariable=agentString)
+againstAgentLabel = tk.Label(root, textvariable=againstAgentString)
+
+gameLabel.grid(column=3,row=2)
+agentLabel.grid(column=3, row=2)
+againstAgentLabel.grid(column=3, row=2)
+
+
 # Set up agents and enviorments
 # Todo: Pull this information from unser input
 baseEnv = rlcard.make('limit-holdem')
 agentRando = RandomAgent(action_num=baseEnv.action_num)
 agentOneLook = OneLookAgent(action_num=baseEnv.action_num)
+
 mainAgent = agentOneLook
 mainAgentName = "One Look"
 otherAgents = [agentRando, agentRando]
@@ -33,18 +92,7 @@ for agent in otherAgents:
 scores = [[] for _ in range(0,len(otherAgents))]
 acumScores = [0 for _ in range(0,len(otherAgents))]
 
-# Create placeholder for our plot that will be generated below
-root = tk.Tk()
 
-fig, ax = plt.subplots()
-fig.suptitle("Rewards - 50 games played")
-canvas = FigureCanvasTkAgg(fig, master=root)
-canvas.get_tk_widget().grid(column=0,row=4, columnspan=2)
-
-fig2, ax2 = plt.subplots()
-fig2.suptitle("Accumulative rewards")
-canvas2 = FigureCanvasTkAgg(fig2, master=root)
-canvas2.get_tk_widget().grid(column=2,row=4)
 
 # Runs when graph is initially shown
 def init():
@@ -87,23 +135,5 @@ def startGame():
     aniLineChart = FuncAnimation(fig2, update2, frames=range(0,10000), init_func=init2, blit=True)
 
 tk.Button(root, text="Start Game", command=startGame).grid(column=3,row=1)
-
-agentList = tk.Listbox(root)
-for item in ["One Look", "Random"]:
-    agentList.insert(tk.END, item)
-agentList.grid(column=0,row=1)
-tk.Button(root, text="PickMainAgent", command=setAgent).grid(column=0,row=2)
-tk.Button(root, text="AddAgainstAgents", command=setAgainstAgent).grid(column=0,row=3)
-
-gameList = tk.Listbox(root)
-for item in ["Limit Holdem", "Black Jack"]:
-    gameList.insert(tk.END, item)
-gameList.grid(column=2,row=1)
-tk.Button(root, text="Pick A Game", command=setAgent).grid(column=2,row=2)
-
-statusString = tk.StringVar()
-statusLabel = tk.Label(root, textvariable=statusString)
-statusString.set("Game: Limit Holdem\n\nMain Agent:\nOne Look\n\nAgainst Agents:\nRandom Agent\nRandom Agent")
-statusLabel.grid(column=3,row=2)
 
 root.mainloop()
