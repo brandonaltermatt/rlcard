@@ -2,7 +2,6 @@ import inspect, sys
 import tkinter as tk
 import numpy as np
 import matplotlib.pyplot as plt
-import GUI.project_parser as parser
 from matplotlib.animation import FuncAnimation
 import rlcard.envs.registration as reg
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -47,24 +46,25 @@ def getAgentNames(agents):
         ret.append(".".join([agentClass.__module__, agentClass.__name__]))
     return ret
 
-# Binds a game with it's players
+# Binds a game with its players
 def makeGame(agents, gameName):
     env = rlcard.make(gameName)
     agents = [a(action_num=env.action_num) for a in agents]
     env.set_agents(agents)
     return env
 
+# Initialize the names of the environment and agents
 envName = ""
 agentName = ""
 againstAgentName = ""
 
-def setGame(game):
+def setGameName(game):
     envName = game
     gameString.set("Game: " + envName + "\n")
-def setAgent(agent):
+def setAgentName(agent):
     agentName = agent
     agentString.set("Main Agent: " + agentName + "\n")
-def setAgainstAgent(againstAgent):
+def setAgainstAgentName(againstAgent):
     againstAgentName = againstAgent
     againstAgentString.set("Against Agents: " + againstAgentName)
 
@@ -84,25 +84,25 @@ canvas2.get_tk_widget().grid(column=2,row=5)
 
 # List the game modes
 gameListBox = tk.Listbox(root, yscrollcommand=1)
-gamesList = parser.getGames()
+gamesList = getGames()
 for game in gamesList:
     gameListBox.insert(tk.END, game)
 
 gameListBox.grid(column=0,row=1)
-tk.Button(root, text="Pick A Game", command= lambda: setGame(gameListBox.get(gameListBox.curselection()))).grid(column=0,row=2)
+tk.Button(root, text="Pick A Game", command= lambda: setGameName(gameListBox.get(gameListBox.curselection()))).grid(column=0,row=2)
 
 # List the agent options
 agentListBox = tk.Listbox(root, width=40, yscrollcommand=1)
-agentList = parser.getAgents()
-agentNames = parser.getAgentNames(agentList)
+agentList = getAgents()
+agentNames = getAgentNames(agentList)
 agentListBox.insert(tk.END, agentNames[0])
 
 for item in agentNames:
     agentListBox.insert(tk.END, item)
 
 agentListBox.grid(column=2,row=1)
-tk.Button(root, text="PickMainAgent", command= lambda: setAgent(agentListBox.get(agentListBox.curselection()))).grid(column=2,row=2)
-tk.Button(root, text="AddAgainstAgents", command= lambda: setAgainstAgent(agentListBox.get(agentListBox.curselection()))).grid(column=2,row=3)
+tk.Button(root, text="PickMainAgent", command= lambda: setAgentName(agentListBox.get(agentListBox.curselection()))).grid(column=2,row=2)
+tk.Button(root, text="AddAgainstAgents", command= lambda: setAgainstAgentName(agentListBox.get(agentListBox.curselection()))).grid(column=2,row=3)
 
 # Display the information about the current game
 gameString = tk.StringVar()
@@ -122,18 +122,7 @@ agentLabel.grid(column=3, row=3)
 againstAgentLabel.grid(column=3, row=4)
 
 
-# Set up agents and enviorments
-# Todo: Pull this information from unser input
-baseEnv = rlcard.make('limit-holdem')
-agentRando = RandomAgent(action_num=baseEnv.action_num)
-agentOneLook = OneLookAgent(action_num=baseEnv.action_num)
-
-mainAgent = agentOneLook
-mainAgentName = "One Look"
-otherAgents = [agentRando, agentRando]
-otherAgentsName = ["Agent Random 1", "Agent Random 2"]
-
-"""
+# Set up agents and environments
 # Todo: Pull this information from user input
 games = getGames()
 print(games)
@@ -146,7 +135,6 @@ mainAgent = agentOptions[-3]
 mainAgentName = agentNames[-3]
 otherAgents = [agentOptions[-3], agentOptions[-3]]
 otherAgentsName = [agentNames[-3], agentNames[-3]]
-"""
 
 # Create a new game for each agent we are comparing agaisnt
 envs = []
