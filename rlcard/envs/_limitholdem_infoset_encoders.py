@@ -120,6 +120,17 @@ class LimitHoldemInfosetEncoder:
                 round_number += 1
         return round_actions
 
+class NoHoleEncoder(LimitHoldemInfosetEncoder):
+    '''
+        This infoset encoder removes the hole information from LimitHoldemInfoSetEncoder,
+        leaving all other bits intact.
+    '''
+    def encode(self, *args, **kwargs):
+        encoded_vector = super().encode(*args, **kwargs)
+        indices_to_delete = [i for i in range(25, 25 + self.amount_of_ranks)]  # Remove hole card rank info
+        indices_to_delete.extend([0, 2, 4, 6, 8])  # Remove flush information related to hole cards
+        return np.delete(encoded_vector, indices_to_delete)
+
 class NoFlushEncoder:
     '''
         Abstracted gamestate encoder that removes suit information from 

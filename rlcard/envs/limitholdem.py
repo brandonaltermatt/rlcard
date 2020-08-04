@@ -6,13 +6,14 @@ import rlcard
 from rlcard.envs import Env
 from rlcard.games.limitholdem import Game
 
-from rlcard.envs._limitholdem_infoset_encoders import LimitHoldemInfosetEncoder, NoFlushEncoder
+from rlcard.envs._limitholdem_infoset_encoders import LimitHoldemInfosetEncoder, NoFlushEncoder, NoHoleEncoder
 
 class LimitholdemEnv(Env):
     ''' Limitholdem Environment
     '''
     INFOSET_ENCODERS = {
         'default': LimitHoldemInfosetEncoder(),
+        'no-hole': NoHoleEncoder(),
         'no-flush': NoFlushEncoder(),
     }
     GAME_CLASS = Game

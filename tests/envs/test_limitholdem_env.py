@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 
 import rlcard
-from rlcard.envs._limitholdem_infoset_encoders import LimitHoldemInfosetEncoder, NoFlushEncoder
+from rlcard.envs._limitholdem_infoset_encoders import LimitHoldemInfosetEncoder, NoFlushEncoder, NoHoleEncoder
 from rlcard.agents.random_agent import RandomAgent
 from .determism_util import is_deterministic
 
@@ -195,6 +195,37 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
         expected_result[3] = 1
         result = e.encode(state, [])
         self.assertTrue(np.array_equal(expected_result[:9], result[:9]))  # Bets encoded correctly
+
+class TestNoHoleEncoder(unittest.TestCase):
+    def test_encoded_vector_has_no_hole_bits(self):
+        state = {'hand': ['S2', 'S3'], 'public_cards': ['S4', 'S5', 'S6', 'H3'], 'player_id': 1}
+        action_record = [
+            [0, 'call'], [1, 'check'],
+            [0, 'check'], [1, 'check'],
+            [0, 'raise']
+        ]
+        e = NoHoleEncoder()
+        expected_result = np.array([
+            # Suits
+            0.,
+            0.,
+            1.,
+            0.,
+            # Bets
+            0., 0., 0., 0.,
+            0., 0., 0., 0.,
+            0., 0., 1., 1.,
+            0., 0., 0., 0.,
+            # Cards
+            0., 0., 1., 1., 1., 0., 0., 0., 0., 0., 0., 0., 0.,
+            0,
+            0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+            0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
+        ])
+        result = e.encode(state, action_record)
+        self.assertTrue(np.array_equal(expected_result[0:4], result[0:4]))  # Suits encoded correctly
+        self.assertTrue(np.array_equal(expected_result[9:25], result[9:25]))  # Bets encoded correctly
+        self.assertTrue(np.array_equal(expected_result[25:], result[25:]))  # Ranks encoded correctly
 
 # TODO Implement test cases
 class TestNoFlushEncoder(unittest.TestCase):
