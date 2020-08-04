@@ -54,19 +54,33 @@ def makeGame(agents, gameName):
     return env
 
 # Initialize the names of the environment and agents
+games = getGames()
+print(games)
+agentOptions = getAgents()
+print(agentOptions)
+agentNames = getAgentNames(agentOptions)
+print(agentNames)
+
 envName = ""
+selectedAgent = agentOptions[0]
 agentName = ""
+selectedAgainstAgent = agentOptions[0]
 againstAgentName = ""
 
-def setGameName(game):
-    envName = game
+def setGameName(selectedTuple):
+    gameIndex = int(selectedTuple[0])
+    envName = games[gameIndex]
     gameString.set("Game: " + envName + "\n")
-def setAgentName(agent):
-    agentName = agent
+def setAgentName(selectedTuple):
+    agentIndex = int(selectedTuple[0])
+    agentName = agentNames[agentIndex]
     agentString.set("Main Agent: " + agentName + "\n")
-def setAgainstAgentName(againstAgent):
-    againstAgentName = againstAgent
+    selectedAgent = agentOptions[agentIndex]
+def setAgainstAgentName(selectedTuple):
+    agentIndex = int(selectedTuple[0])
+    againstAgentName = agentNames[agentIndex]
     againstAgentString.set("Against Agents: " + againstAgentName)
+    selectedAgainstAgent = agentOptions[agentIndex]
 
 
 # Create placeholder for our plot that will be generated below
@@ -84,25 +98,20 @@ canvas2.get_tk_widget().grid(column=2,row=5)
 
 # List the game modes
 gameListBox = tk.Listbox(root, yscrollcommand=1)
-gamesList = getGames()
-for game in gamesList:
+for game in games:
     gameListBox.insert(tk.END, game)
 
 gameListBox.grid(column=0,row=1)
-tk.Button(root, text="Pick A Game", command= lambda: setGameName(gameListBox.get(gameListBox.curselection()))).grid(column=0,row=2)
+tk.Button(root, text="Pick A Game", command= lambda: setGameName(gameListBox.curselection())).grid(column=0,row=2)
 
 # List the agent options
 agentListBox = tk.Listbox(root, width=40, yscrollcommand=1)
-agentList = getAgents()
-agentNames = getAgentNames(agentList)
-agentListBox.insert(tk.END, agentNames[0])
-
 for item in agentNames:
     agentListBox.insert(tk.END, item)
 
 agentListBox.grid(column=2,row=1)
-tk.Button(root, text="PickMainAgent", command= lambda: setAgentName(agentListBox.get(agentListBox.curselection()))).grid(column=2,row=2)
-tk.Button(root, text="AddAgainstAgents", command= lambda: setAgainstAgentName(agentListBox.get(agentListBox.curselection()))).grid(column=2,row=3)
+tk.Button(root, text="PickMainAgent", command= lambda: setAgentName(agentListBox.curselection())).grid(column=2,row=2)
+tk.Button(root, text="AddAgainstAgents", command= lambda: setAgainstAgentName(agentListBox.curselection())).grid(column=2,row=3)
 
 # Display the information about the current game
 gameString = tk.StringVar()
@@ -124,13 +133,6 @@ againstAgentLabel.grid(column=3, row=4)
 
 # Set up agents and environments
 # Todo: Pull this information from user input
-games = getGames()
-print(games)
-agentOptions = getAgents()
-print(agentOptions)
-agentNames = getAgentNames(agentOptions)
-print(agentNames)
-
 mainAgent = agentOptions[-3]
 mainAgentName = agentNames[-3]
 otherAgents = [agentOptions[-3], agentOptions[-3]]
