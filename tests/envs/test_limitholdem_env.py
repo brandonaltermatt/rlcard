@@ -100,6 +100,9 @@ class TestLimitholdemEnv(unittest.TestCase):
         self.assertEqual(len(player1_obs), 63)
 
 class TestLimitHoldemInfosetEncoder(unittest.TestCase):
+    def test_correct_state_shape(self):
+        self.assertEqual(NoHoleEncoder.STATE_SHAPE, [78])
+
     def test_encode_full_game(self):
         state = {'hand': ['S2', 'S3'], 'public_cards': ['S4', 'S5', 'S6', 'H3', 'H2'], 'player_id': 0}
         action_record = [
@@ -197,6 +200,9 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
         self.assertTrue(np.array_equal(expected_result[:9], result[:9]))  # Bets encoded correctly
 
 class TestNoHoleEncoder(unittest.TestCase):
+    def test_correct_state_shape(self):
+        self.assertEqual(NoHoleEncoder.STATE_SHAPE, [60])
+
     def test_encoded_vector_has_no_hole_bits(self):
         state = {'hand': ['S2', 'S3'], 'public_cards': ['S4', 'S5', 'S6', 'H3'], 'player_id': 1}
         action_record = [
