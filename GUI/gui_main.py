@@ -1,14 +1,58 @@
+import inspect, sys
 import tkinter as tk
 import numpy as np
 import matplotlib.pyplot as plt
 import GUI.project_parser as parser
 from matplotlib.animation import FuncAnimation
+import rlcard.envs.registration as reg
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 import rlcard
 from rlcard.agents import RandomAgent
-from rlcard.agents.one_look_agent import OneLookAgent
 from rlcard.utils import set_global_seed, tournament
+import rlcard.games as games
+import rlcard.agents as agents
+
+# Finds the name of all the different games supported
+# Returns list of strings
+def getGames():
+    return list(reg.registry.env_specs.keys())
+
+# https://stackoverflow.com/questions/1796180/how-can-i-get-a-list-of-all-classes-within-current-module-in-python
+# https://stackoverflow.com/questions/510972/getting-the-class-name-of-an-instance
+# https://stackoverflow.com/questions/48000761/list-submodules-of-a-python-module
+# Whoever found this deserves a medal
+# Finds the class objects for all impleented agents.  Assumes all agents are in rlcard/agents folder
+# Returns list of class objects
+def getAgents():
+    agentList = []
+    agentFiles = dir(agents)
+    # Some non-agent folders are provided, but they start with  "_"
+    agentFiles = list(filter(lambda x : not x.startswith("_"), agentFiles))
+    for agentFile in agentFiles:
+        try:
+            for _, obj in inspect.getmembers(sys.modules["rlcard.agents." + agentFile]):
+                if inspect.isclass(obj):
+                    agentList.append(obj)
+        except BaseException as e:
+            print("Error: " + str(e))
+    return agentList
+
+# https://stackoverflow.com/questions/2020014/get-fully-qualified-class-name-of-an-object-in-python
+# Converts agent class to agent names for displaying
+# returns list of string
+def getAgentNames(agents):
+    ret = []
+    for agentClass in agents:
+        ret.append(".".join([agentClass.__module__, agentClass.__name__]))
+    return ret
+
+# Binds a game with it's players
+def makeGame(agents, gameName):
+    env = rlcard.make(gameName)
+    agents = [a(action_num=env.action_num) for a in agents]
+    env.set_agents(agents)
+    return env
 
 envName = ""
 agentName = ""
@@ -89,12 +133,26 @@ mainAgentName = "One Look"
 otherAgents = [agentRando, agentRando]
 otherAgentsName = ["Agent Random 1", "Agent Random 2"]
 
+"""
+# Todo: Pull this information from user input
+games = getGames()
+print(games)
+agentOptions = getAgents()
+print(agentOptions)
+agentNames = getAgentNames(agentOptions)
+print(agentNames)
+
+mainAgent = agentOptions[-3]
+mainAgentName = agentNames[-3]
+otherAgents = [agentOptions[-3], agentOptions[-3]]
+otherAgentsName = [agentNames[-3], agentNames[-3]]
+"""
+
 # Create a new game for each agent we are comparing agaisnt
 envs = []
 for agent in otherAgents:
-    env = rlcard.make('limit-holdem')
-    env.set_agents([mainAgent, agent])
-    envs.append(env)
+    envs.append(makeGame([mainAgent, agent], games[3]))
+
 scores = [[] for _ in range(0,len(otherAgents))]
 acumScores = [0 for _ in range(0,len(otherAgents))]
 
@@ -139,6 +197,12 @@ def update2(i):
 def startGame():
     aniLineChart = FuncAnimation(fig, update, frames=range(0,10000), init_func=init, blit=True)
     aniLineChart = FuncAnimation(fig2, update2, frames=range(0,10000), init_func=init2, blit=True)
+
+def setAgent():
+    pass
+def setAgainstAgent():
+    pass
+
 
 tk.Button(root, text="Start Game", command=startGame).grid(column=3,row=1)
 
