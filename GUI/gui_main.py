@@ -16,10 +16,10 @@ againstAgentName = ""
 
 def setGame(game):
     envName = game
-    gameString.set("Game: " + envName + "\n\n")
+    gameString.set("Game: " + envName + "\n")
 def setAgent(agent):
     agentName = agent
-    agentString.set("Main Agent: " + agentName + "\n\n")
+    agentString.set("Main Agent: " + agentName + "\n")
 def setAgainstAgent(againstAgent):
     againstAgentName = againstAgent
     againstAgentString.set("Against Agents: " + againstAgentName)
@@ -31,15 +31,15 @@ root = tk.Tk()
 fig, ax = plt.subplots()
 fig.suptitle("Rewards - 50 games played")
 canvas = FigureCanvasTkAgg(fig, master=root)
-canvas.get_tk_widget().grid(column=0,row=4, columnspan=2)
+canvas.get_tk_widget().grid(column=0,row=5, columnspan=2)
 
 fig2, ax2 = plt.subplots()
 fig2.suptitle("Accumulative rewards")
 canvas2 = FigureCanvasTkAgg(fig2, master=root)
-canvas2.get_tk_widget().grid(column=2,row=4)
+canvas2.get_tk_widget().grid(column=2,row=5)
 
 # List the game modes
-gameListBox = tk.Listbox(root)
+gameListBox = tk.Listbox(root, yscrollcommand=1)
 gamesList = parser.getGames()
 for game in gamesList:
     gameListBox.insert(tk.END, game)
@@ -48,11 +48,13 @@ gameListBox.grid(column=0,row=1)
 tk.Button(root, text="Pick A Game", command= lambda: setGame(gameListBox.get(gameListBox.curselection()))).grid(column=0,row=2)
 
 # List the agent options
-agentListBox = tk.Listbox(root)
-agentsList = parser.getAgents()
-agentsNames = parser.getAgentNames(agentsList)
-for name in agentsList:
-    agentListBox.insert(tk.END, name)
+agentListBox = tk.Listbox(root, width=40, yscrollcommand=1)
+agentList = parser.getAgents()
+agentNames = parser.getAgentNames(agentList)
+agentListBox.insert(tk.END, agentNames[0])
+
+for item in agentNames:
+    agentListBox.insert(tk.END, item)
 
 agentListBox.grid(column=2,row=1)
 tk.Button(root, text="PickMainAgent", command= lambda: setAgent(agentListBox.get(agentListBox.curselection()))).grid(column=2,row=2)
@@ -67,9 +69,13 @@ gameLabel = tk.Label(root, textvariable=gameString)
 agentLabel = tk.Label(root, textvariable=agentString)
 againstAgentLabel = tk.Label(root, textvariable=againstAgentString)
 
+gameString.set("Game: " + envName + "\n")
+agentString.set("Main Agent: " + agentName + "\n")
+againstAgentString.set("Against Agents: " + againstAgentName)
+
 gameLabel.grid(column=3,row=2)
-agentLabel.grid(column=3, row=2)
-againstAgentLabel.grid(column=3, row=2)
+agentLabel.grid(column=3, row=3)
+againstAgentLabel.grid(column=3, row=4)
 
 
 # Set up agents and enviorments

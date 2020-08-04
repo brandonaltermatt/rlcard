@@ -37,10 +37,12 @@ def makeGame(agents, gameName):
     return env
 
 # Display the lists of games and agents
-
+# Weird bug: Uncommenting the code block below will prevent the agent list in the GUI from dynamically populating
+"""
 games = getGames()
 print(games)
 agents = getAgents()
 agentNames = getAgentNames(agents)
 print(agentNames)
 #env = makeGame(agents[-6], games[3])
+"""
