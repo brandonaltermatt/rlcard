@@ -67,6 +67,7 @@ agentName = ""
 selectedAgainstAgent = agentOptions[0]
 againstAgentName = ""
 
+# Store the user selected game and agent in variables, update the status bar
 def setGameName(selectedTuple):
     gameIndex = int(selectedTuple[0])
     envName = games[gameIndex]
@@ -109,9 +110,9 @@ agentListBox = tk.Listbox(root, width=40, yscrollcommand=1)
 for item in agentNames:
     agentListBox.insert(tk.END, item)
 
-agentListBox.grid(column=2,row=1)
-tk.Button(root, text="PickMainAgent", command= lambda: setAgentName(agentListBox.curselection())).grid(column=2,row=2)
-tk.Button(root, text="AddAgainstAgents", command= lambda: setAgainstAgentName(agentListBox.curselection())).grid(column=2,row=3)
+agentListBox.grid(column=1,row=1)
+tk.Button(root, text="PickMainAgent", command= lambda: setAgentName(agentListBox.curselection())).grid(column=1,row=2)
+tk.Button(root, text="AddAgainstAgents", command= lambda: setAgainstAgentName(agentListBox.curselection())).grid(column=1,row=3)
 
 # Display the information about the current game
 gameString = tk.StringVar()
@@ -122,13 +123,13 @@ gameLabel = tk.Label(root, textvariable=gameString)
 agentLabel = tk.Label(root, textvariable=agentString)
 againstAgentLabel = tk.Label(root, textvariable=againstAgentString)
 
-gameString.set("Game: " + envName + "\n")
-agentString.set("Main Agent: " + agentName + "\n")
-againstAgentString.set("Against Agents: " + againstAgentName)
+gameString.set("Game: ")
+agentString.set("Main Agent: ")
+againstAgentString.set("Against Agents: ")
 
-gameLabel.grid(column=3,row=2)
-agentLabel.grid(column=3, row=3)
-againstAgentLabel.grid(column=3, row=4)
+gameLabel.grid(column=2,row=1)
+agentLabel.grid(column=2, row=2)
+againstAgentLabel.grid(column=2, row=3)
 
 
 # Set up agents and environments
