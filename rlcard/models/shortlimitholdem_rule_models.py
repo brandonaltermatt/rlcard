@@ -143,7 +143,7 @@ class ShortLimitholdemRuleAgentV2(object):
                 if hand[1][1] == 'K' or hand[1][1] == 'Q' or hand[1][1] == 'J' or hand[1][1] == 'T':
                     action = 'raise'
         if len(public_cards) == 3:
-            public_cards_ranks = ['A', 'A', 'A']
+            _public_cards_ranks = ['A', 'A', 'A']
             public_cards_flush = ['S', 'S', 'S']
             for i, _ in enumerate(public_cards):
                 public_cards_ranks[i] = public_cards[i][1]
