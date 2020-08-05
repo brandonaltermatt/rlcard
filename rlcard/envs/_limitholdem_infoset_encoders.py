@@ -1,9 +1,12 @@
+import os
+import json
 import numpy as np
+import rlcard
 
 class LimitHoldemInfosetEncoder:
-    RANK_ORDER = '23456789TJQKA'  # Allows for extension of No Limit Holdem encoding
+    RANK_ORDER = '23456789TJQKA'
     AMOUNT_OF_RANKS = len(RANK_ORDER)
-    STATE_SIZE = 26 + AMOUNT_OF_RANKS * 4
+    STATE_SIZE = 78
     STATE_SHAPE = [STATE_SIZE]
 
     def __init__(self):
@@ -22,7 +25,7 @@ class LimitHoldemInfosetEncoder:
             Returns:
                 A binary list of the encoded info set
         '''
-        self._encoded_vector = np.zeros(LimitHoldemInfosetEncoder.STATE_SIZE)
+        self._encoded_vector = np.zeros(self.STATE_SIZE)
         self._encode_cards(player_state)
         self._encode_bets(player_state['player_id'], action_record)
         return self._encoded_vector
@@ -46,12 +49,12 @@ class LimitHoldemInfosetEncoder:
         turn_cards = player_state['public_cards'][3:4]
         river_cards = player_state['public_cards'][4:5]
         encode_round_ranks(hole_cards, 25)
-        encode_round_ranks(flop_cards, (25 + LimitHoldemInfosetEncoder.AMOUNT_OF_RANKS))
-        encode_round_ranks(turn_cards, (25 + (LimitHoldemInfosetEncoder.AMOUNT_OF_RANKS * 2) + 1))
-        encode_round_ranks(river_cards, (25 + (LimitHoldemInfosetEncoder.AMOUNT_OF_RANKS * 3) + 1))
+        encode_round_ranks(flop_cards, (25 + self.AMOUNT_OF_RANKS))
+        encode_round_ranks(turn_cards, (25 + (self.AMOUNT_OF_RANKS * 2) + 1))
+        encode_round_ranks(river_cards, (25 + (self.AMOUNT_OF_RANKS * 3) + 1))
         # If there is a pair in the flop, set 1 if the pair is the higher of the two ranks
         if flop_cards and flop_cards[1][1] != flop_cards[0][1] and flop_cards[1][1] == flop_cards[2][1]:
-            self._encoded_vector[25 + LimitHoldemInfosetEncoder.AMOUNT_OF_RANKS * 2] = 1
+            self._encoded_vector[25 + self.AMOUNT_OF_RANKS * 2] = 1
 
     def _encode_card_suits(self, player_state):
         hole_card_suits = [card[0] for card in player_state['hand']]
@@ -120,19 +123,42 @@ class LimitHoldemInfosetEncoder:
                 round_number += 1
         return round_actions
 
+class OldLimitHoldemInfosetEncoder:
+    STATE_SIZE = 72
+    STATE_SHAPPE = [STATE_SIZE]
+
+    def __init__(self):
+        with open(os.path.join(rlcard.__path__[0], 'games/nolimitholdem/card2index.json'), 'r') as file:
+            self.card2index = json.load(file)
+
+    def encode(self, player_state, *_):
+        public_cards = player_state['public_cards']
+        hand = player_state['hand']
+        raise_nums = player_state['raise_nums']
+        cards = public_cards + hand
+        idx = [self.card2index[card] for card in cards]
+        obs = np.zeros(72)
+        obs[idx] = 1
+        for i, num in enumerate(raise_nums):
+            obs[52 + i * 5 + num] = 1
+        return obs
+
 class NoHoleEncoder(LimitHoldemInfosetEncoder):
     '''
         This infoset encoder removes the hole information from LimitHoldemInfoSetEncoder,
         leaving all other bits intact.
     '''
-    STATE_SIZE = 21 + LimitHoldemInfosetEncoder.AMOUNT_OF_RANKS * 3
+    STATE_SIZE = 60
     STATE_SHAPE = [STATE_SIZE]
+    BITS_TO_DELETE = [
+        0, 2, 4, 6, 8,
+        25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37
+    ]
 
     def encode(self, *args, **kwargs):
-        encoded_vector = super().encode(*args, **kwargs)
-        indices_to_delete = [i for i in range(25, 25 + self.AMOUNT_OF_RANKS)]  # Remove hole card rank info
-        indices_to_delete.extend([0, 2, 4, 6, 8])  # Remove flush information related to hole cards
-        return np.delete(encoded_vector, indices_to_delete)
+        e = LimitHoldemInfosetEncoder()
+        encoded_vector = e.encode(*args, **kwargs)
+        return np.delete(encoded_vector, NoHoleEncoder.BITS_TO_DELETE)
 
 class NoFlushEncoder:
     '''
@@ -151,6 +177,8 @@ class NoFlushEncoder:
         bit +1: opp bet or raised on turn
     '''
     RANK_ORDER = '23456789TJQKA' 
+    STATE_SIZE = 63
+    STATE_SHAPE = [STATE_SIZE]
     
     def __init__(self):
         self.amount_of_ranks = len(self.RANK_ORDER)
