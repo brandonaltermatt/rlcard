@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 
 import rlcard
-from rlcard.envs._limitholdem_infoset_encoders import LimitHoldemInfosetEncoder, NoFlushEncoder, NoHoleEncoder
+from rlcard.envs._limitholdem_infoset_encoders import LimitHoldemInfosetEncoder, NoFlushEncoder, NoHoleEncoder, OldLimitHoldemInfosetEncoder
 from rlcard.agents.random_agent import RandomAgent
 from .determism_util import is_deterministic
 
@@ -101,7 +101,7 @@ class TestLimitholdemEnv(unittest.TestCase):
 
 class TestLimitHoldemInfosetEncoder(unittest.TestCase):
     def test_correct_state_shape(self):
-        self.assertEqual(NoHoleEncoder.STATE_SHAPE, [78])
+        self.assertEqual(LimitHoldemInfosetEncoder.STATE_SHAPE, [78])
 
     def test_encode_full_game(self):
         state = {'hand': ['S2', 'S3'], 'public_cards': ['S4', 'S5', 'S6', 'H3', 'H2'], 'player_id': 0}
@@ -132,6 +132,7 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
             1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
         ])
         result = e.encode(state, action_record)
+        self.assertEqual(len(result), LimitHoldemInfosetEncoder.STATE_SIZE)
         self.assertTrue(np.array_equal(expected_result[0:9], result[0:9]))  # Suits encoded correctly
         self.assertTrue(np.array_equal(expected_result[9:25], result[9:25]))  # Bets encoded correctly
         self.assertTrue(np.array_equal(expected_result[25:], result[25:]))  # Ranks encoded correctly
@@ -229,12 +230,16 @@ class TestNoHoleEncoder(unittest.TestCase):
             0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
         ])
         result = e.encode(state, action_record)
+        self.assertEqual(len(result), NoHoleEncoder.STATE_SIZE)
         self.assertTrue(np.array_equal(expected_result[0:4], result[0:4]))  # Suits encoded correctly
         self.assertTrue(np.array_equal(expected_result[9:25], result[9:25]))  # Bets encoded correctly
         self.assertTrue(np.array_equal(expected_result[25:], result[25:]))  # Ranks encoded correctly
 
 # TODO Implement test cases
 class TestNoFlushEncoder(unittest.TestCase):
+    pass
+
+class TestOldLimitHoldemInfosetEncoder(unittest.TestCase):
     pass
 
 
