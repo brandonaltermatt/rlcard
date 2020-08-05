@@ -5,6 +5,7 @@ from rlcard.games.shortlimitholdem import Game
 class ShortlimitholdemEnv(LimitholdemEnv):
     INFOSET_ENCODERS = {
         'default': encoders.ShortLimitHoldemInfosetEncoder(),
+        'old-encoder': encoders.OldShortLimitHoldemInfosetEncoder(),
         'no-hole': encoders.ShortLimitHoldemNoHoleEncoder(),
         'no-flush': encoders.ShortLimitHoldemNoFlushEncoder(),
     }
