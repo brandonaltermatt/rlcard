@@ -3,68 +3,41 @@ import tkinter as tk
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-import rlcard.envs.registration as reg
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 import rlcard
 from rlcard.agents import RandomAgent
 from rlcard.utils import set_global_seed, tournament
-import rlcard.games as games
-import rlcard.agents as agents
+import rlcard.envs.registration as EnvReg
+import rlcard.models.registration as ModelReg
 
 # Finds the name of all the different games supported
 # Returns list of strings
-def getGames():
-    return list(reg.registry.env_specs.keys())
+def get_all_games():
+    return list(EnvReg.registry.env_specs.keys())
 
-# https://stackoverflow.com/questions/1796180/how-can-i-get-a-list-of-all-classes-within-current-module-in-python
-# https://stackoverflow.com/questions/510972/getting-the-class-name-of-an-instance
-# https://stackoverflow.com/questions/48000761/list-submodules-of-a-python-module
-# Whoever found this deserves a medal
-# Finds the class objects for all impleented agents.  Assumes all agents are in rlcard/agents folder
-# Returns list of class objects
-def getAgents():
-    agentList = []
-    agentFiles = dir(agents)
-    # Some non-agent folders are provided, but they start with  "_"
-    agentFiles = list(filter(lambda x : not x.startswith("_"), agentFiles))
-    for agentFile in agentFiles:
-        try:
-            for _, obj in inspect.getmembers(sys.modules["rlcard.agents." + agentFile]):
-                if inspect.isclass(obj):
-                    agentList.append(obj)
-        except BaseException as e:
-            print("Error: " + str(e))
-    return agentList
-
-# https://stackoverflow.com/questions/2020014/get-fully-qualified-class-name-of-an-object-in-python
-# Converts agent class to agent names for displaying
-# returns list of string
-def getAgentNames(agents):
-    ret = []
-    for agentClass in agents:
-        ret.append(".".join([agentClass.__module__, agentClass.__name__]))
-    return ret
+def get_all_trained_agents():
+    allAgents = []
+    agentNames = []
+    for name, agent in ModelReg.model_registry.model_specs.items():
+        agentNames.append(name)
+        allAgents.append(agent.load().agents)
+    return (allAgents, agentNames)
 
 # Binds a game with its players
 def makeGame(agents, gameName):
     env = rlcard.make(gameName)
-    agents = [a(action_num=env.action_num) for a in agents]
     env.set_agents(agents)
     return env
 
 # Initialize the names of the environment and agents
-games = getGames()
-print(games)
-agentOptions = getAgents()
-print(agentOptions)
-agentNames = getAgentNames(agentOptions)
-print(agentNames)
+games = get_all_games()
+(allAgents, agentNames) = get_all_trained_agents()
 
 envName = ""
-selectedAgent = agentOptions[0]
+selectedAgent = allAgents[0]
 agentName = ""
-selectedAgainstAgent = agentOptions[0]
+selectedAgainstAgent = allAgents[0]
 againstAgentName = ""
 
 # Store the user selected game and agent in variables, update the status bar
@@ -72,16 +45,18 @@ def setGameName(selectedTuple):
     gameIndex = int(selectedTuple[0])
     envName = games[gameIndex]
     gameString.set("Game: " + envName + "\n")
+
 def setAgentName(selectedTuple):
     agentIndex = int(selectedTuple[0])
     agentName = agentNames[agentIndex]
     agentString.set("Main Agent: " + agentName + "\n")
-    selectedAgent = agentOptions[agentIndex]
+    selectedAgent = allAgents[agentIndex]
+
 def setAgainstAgentName(selectedTuple):
     agentIndex = int(selectedTuple[0])
     againstAgentName = agentNames[agentIndex]
     againstAgentString.set("Against Agents: " + againstAgentName)
-    selectedAgainstAgent = agentOptions[agentIndex]
+    selectedAgainstAgent = allAgents[agentIndex]
 
 
 # Create placeholder for our plot that will be generated below
@@ -134,9 +109,9 @@ againstAgentLabel.grid(column=2, row=3)
 
 # Set up agents and environments
 # Todo: Pull this information from user input
-mainAgent = agentOptions[-3]
+mainAgent = allAgents[-3]
 mainAgentName = agentNames[-3]
-otherAgents = [agentOptions[-3], agentOptions[-3]]
+otherAgents = [allAgents[-3], allAgents[-3]]
 otherAgentsName = [agentNames[-3], agentNames[-3]]
 
 # Create a new game for each agent we are comparing agaisnt
