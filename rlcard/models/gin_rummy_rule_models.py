@@ -117,7 +117,9 @@ class GinRummyNoviceRuleModel(Model):
         ''' Load pre-trained model
         '''
         super().__init__()
-        env = rlcard.make('gin-rummy')
+        self.game = 'gin-rummy'
+        env = rlcard.make(self.game)
+
         rule_agent = GinRummyNoviceRuleAgent()
         self.rule_agents = [rule_agent for _ in range(env.player_num)]
 

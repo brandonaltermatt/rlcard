@@ -12,7 +12,8 @@ class OneLookModelShortHoldem(LimitholdemRuleModelV1):
     def __init__(self):
         ''' Load pretrained model
         '''
-        env = rlcard.make("short-limit-holdem")
+        self.game = "short-limit-holdem"
+        env = rlcard.make(self.game)
 
         rule_agent = OneLookAgent(env.action_num)
         self.rule_agents = [rule_agent for _ in range(env.player_num)]

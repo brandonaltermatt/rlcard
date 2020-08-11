@@ -16,12 +16,13 @@ import rlcard.models.registration as ModelReg
 def get_all_games():
     return list(EnvReg.registry.env_specs.keys())
 
-def get_all_trained_agents():
+def get_all_trained_agents(gameName=None):
     allAgents = []
     agentNames = []
     for agent in ModelReg.model_registry.model_specs.values():
-        agentNames.append(agent.model_id)
-        allAgents.append(agent.load().agents[0]) # assumes player is P1
+        if gameName == None or agent.game == gameName:
+            agentNames.append(agent.model_id)
+            allAgents.append(agent.load().agents[0]) # assumes player is P1
     return (allAgents, agentNames)
 
 # Binds a game with its players

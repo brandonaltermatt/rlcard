@@ -12,7 +12,8 @@ class RandomModelBlackJack(LimitholdemRuleModelV1):
     def __init__(self):
         ''' Load pretrained model
         '''
-        env = rlcard.make("blackjack")
+        self.game = "blackjack"
+        env = rlcard.make(self.game)
 
         rule_agent = RandomAgent(env.action_num)
         self.rule_agents = [rule_agent for _ in range(env.player_num)]
@@ -24,7 +25,8 @@ class RandomModelDoudizhu(LimitholdemRuleModelV1):
     def __init__(self):
         ''' Load pretrained model
         '''
-        env = rlcard.make("doudizhu")
+        self.game = "doudizhu"
+        env = rlcard.make(self.game)
 
         rule_agent = RandomAgent(env.action_num)
         self.rule_agents = [rule_agent for _ in range(env.player_num)]
@@ -36,7 +38,8 @@ class RandomModelShortLimitHoldem(LimitholdemRuleModelV1):
     def __init__(self):
         ''' Load pretrained model
         '''
-        env = rlcard.make("short-limit-holdem")
+        self.game = "short-limit-holdem"
+        env = rlcard.make(self.game)
 
         rule_agent = RandomAgent(env.action_num)
         self.rule_agents = [rule_agent for _ in range(env.player_num)]

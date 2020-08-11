@@ -60,7 +60,8 @@ class LeducHoldemNFSPPytorchModel(Model):
         '''
         import torch
         from rlcard.agents import NFSPAgentPytorch
-        env = rlcard.make('leduc-holdem')
+        self.game = "leduc-holdem"
+        env = rlcard.make(self.game)
         self.nfsp_agents = []
         for i in range(env.player_num):
             agent = NFSPAgentPytorch(scope='nfsp' + str(i),
@@ -95,7 +96,9 @@ class LeducHoldemCFRModel(Model):
     def __init__(self):
         ''' Load pretrained model
         '''
-        env = rlcard.make('leduc-holdem')
+        self.game = "leduc-holdem"
+        env = rlcard.make(self.game)
+
         self.agent = CFRAgent(env, model_path=os.path.join(ROOT_PATH, 'leduc_holdem_cfr'))
         self.agent.load()
     @property
