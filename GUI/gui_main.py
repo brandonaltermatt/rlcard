@@ -19,15 +19,15 @@ def get_all_games():
 def get_all_trained_agents():
     allAgents = []
     agentNames = []
-    for name, agent in ModelReg.model_registry.model_specs.items():
-        agentNames.append(name)
-        allAgents.append(agent.load().agents)
+    for agent in ModelReg.model_registry.model_specs.values():
+        agentNames.append(agent.model_id)
+        allAgents.append(agent.load().agents[0]) # assumes player is P1
     return (allAgents, agentNames)
 
 # Binds a game with its players
-def makeGame(agents, gameName):
+def makeGame(players, gameName):
     env = rlcard.make(gameName)
-    env.set_agents(agents)
+    env.set_agents(players)
     return env
 
 # Initialize the names of the environment and agents
