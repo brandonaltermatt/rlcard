@@ -11,6 +11,18 @@ from rlcard.utils import set_global_seed, tournament
 import rlcard.envs.registration as EnvReg
 import rlcard.models.registration as ModelReg
 
+# Global placehodlers. Will be initialized when start button is pressed
+envs = None
+scores = None
+acumScores = None
+gamesPlayed = None
+
+# Global user selction placeholders
+selectedAgent = None
+envName = None
+selectedAgainstAgents = []
+selectedAgainstAgentNames = []
+
 # Finds the name of all the different games supported
 # Returns list of strings
 def get_all_games():
@@ -31,34 +43,82 @@ def makeGame(players, gameName):
     env.set_agents(players)
     return env
 
-# Initialize the names of the environment and agents
-games = get_all_games()
-(allAgents, agentNames) = get_all_trained_agents()
-
-envName = ""
-selectedAgent = allAgents[0]
-agentName = ""
-selectedAgainstAgent = allAgents[0]
-againstAgentName = ""
-
 # Store the user selected game and agent in variables, update the status bar
 def setGameName(selectedTuple):
+    global envName
     gameIndex = int(selectedTuple[0])
     envName = games[gameIndex]
     gameString.set("Game: " + envName + "\n")
 
 def setAgentName(selectedTuple):
+    global selectedAgent
     agentIndex = int(selectedTuple[0])
     agentName = agentNames[agentIndex]
     agentString.set("Main Agent: " + agentName + "\n")
     selectedAgent = allAgents[agentIndex]
 
 def setAgainstAgentName(selectedTuple):
+    global selectedAgainstAgents, selectedAgainstAgentNames
     agentIndex = int(selectedTuple[0])
-    againstAgentName = agentNames[agentIndex]
-    againstAgentString.set("Against Agents: " + againstAgentName)
-    selectedAgainstAgent = allAgents[agentIndex]
+    selectedAgainstAgents.append(allAgents[agentIndex])
+    selectedAgainstAgentNames.append(agentNames[agentIndex])
+    againstAgentString.set("Against Agents: " + "\n".join(selectedAgainstAgentNames))
+    
 
+# Puts updating the graph on a loop
+def startGame():
+    global scores, acumScores, envs, gamesPlayed
+    envs = []
+    for agent in selectedAgainstAgents:
+        envs.append(makeGame([selectedAgent, agent], envName))
+    scores = [[] for _ in range(0,len(selectedAgainstAgents))]
+    acumScores = [0 for _ in range(0,len(selectedAgainstAgents))]
+    gamesPlayed = []
+
+    aniLineChart1 = FuncAnimation(fig, update, frames=range(0,10000), init_func=init, blit=True)
+    aniLineChart2 = FuncAnimation(fig2, update2, frames=range(0,10000), init_func=init2, blit=True)
+
+# Runs when graph is initially shown
+def init():
+    return ax,
+
+# Runs every iteration. i Is the iteration count
+def update(i):
+    global acumScores
+    ax.clear()
+    for gameNum, env in enumerate(envs):
+        data, newResults = env.run(is_training=False)
+        print(data)
+        print(newResults)
+        scores[gameNum].append(newResults)
+        acumScores[gameNum] += newResults[1]
+        line, = ax.plot(range(0,len(scores[gameNum])), [s[1] for s in scores[gameNum]])
+        line.set_label(selectedAgainstAgents[gameNum])
+        ax.legend()
+        
+    # Plotting other agent's rewards, so just a line of 0 for reference
+    line, = ax.plot(range(0,len(scores[0])), [0 for _ in scores[0]])
+    line.set_label(selectedAgent)
+    ax.legend()
+    ax.grid('on')
+    return ax,
+
+# Runs when graph is initially shown
+def init2():
+    return ax2,
+
+# Runs every iteration. i Is the iteration count
+def update2(i):
+    global acumScores
+    ax2.clear()
+    ax2.bar(selectedAgainstAgentNames, acumScores)
+    ax2.grid('on')
+    return ax2,
+
+
+# Initialize the names of the environment and agents for menu creation
+games = get_all_games()
+(allAgents, agentNames) = get_all_trained_agents()
 
 # Create placeholder for our plot that will be generated below
 root = tk.Tk()
@@ -106,70 +166,6 @@ againstAgentString.set("Against Agents: ")
 gameLabel.grid(column=2,row=1)
 agentLabel.grid(column=2, row=2)
 againstAgentLabel.grid(column=2, row=3)
-
-
-# Set up agents and environments
-# Todo: Pull this information from user input
-mainAgent = allAgents[-3]
-mainAgentName = agentNames[-3]
-otherAgents = [allAgents[-3], allAgents[-3]]
-otherAgentsName = [agentNames[-3], agentNames[-3]]
-
-# Create a new game for each agent we are comparing agaisnt
-envs = []
-for agent in otherAgents:
-    envs.append(makeGame([mainAgent, agent], games[3]))
-
-scores = [[] for _ in range(0,len(otherAgents))]
-acumScores = [0 for _ in range(0,len(otherAgents))]
-
-
-
-# Runs when graph is initially shown
-def init():
-    return ax,
-
-# Runs every iteration. i Is the iteration count
-def update(i):
-    global acumScores
-    ax.clear()
-    for gameNum, env in enumerate(envs):
-        newResults = tournament(env, 1)
-        print(newResults)
-        scores[gameNum].append(newResults)
-        acumScores[gameNum] += newResults[1]
-        line, = ax.plot(range(0,len(scores[gameNum])), [s[1] for s in scores[gameNum]])
-        line.set_label(otherAgentsName[gameNum])
-        ax.legend()
-        
-    line, = ax.plot(range(0,len(scores[0])), [0 for _ in scores[0]])
-    line.set_label(mainAgentName)
-    ax.legend()
-    ax.grid('on')
-    return ax,
-
-# Runs when graph is initially shown
-def init2():
-    return ax2,
-
-# Runs every iteration. i Is the iteration count
-def update2(i):
-    global acumScores
-    ax2.clear()
-    ax2.bar(otherAgentsName, acumScores)
-    ax2.grid('on')
-    return ax2,
-
-# Puts updating the graph on a loop
-def startGame():
-    aniLineChart = FuncAnimation(fig, update, frames=range(0,10000), init_func=init, blit=True)
-    aniLineChart = FuncAnimation(fig2, update2, frames=range(0,10000), init_func=init2, blit=True)
-
-def setAgent():
-    pass
-def setAgainstAgent():
-    pass
-
 
 tk.Button(root, text="Start Game", command=startGame).grid(column=3,row=1)
 
