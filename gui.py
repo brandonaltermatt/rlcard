@@ -1,5 +1,6 @@
 import inspect, sys
 import tkinter as tk
+from tkinter.filedialog import asksaveasfile 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -19,6 +20,7 @@ gamesPlayed = None
 
 # Global user selction placeholders
 selectedAgent = None
+selectedAgentName = None
 envName = None
 selectedAgainstAgents = []
 selectedAgainstAgentNames = []
@@ -56,13 +58,14 @@ def setAgentName(selectedTuple):
     agentName = agentNames[agentIndex]
     agentString.set("Main Agent: " + agentName + "\n")
     selectedAgent = allAgents[agentIndex]
+    selectedAgentName = agentNames[agentIndex]
 
 def setAgainstAgentName(selectedTuple):
     global selectedAgainstAgents, selectedAgainstAgentNames
     agentIndex = int(selectedTuple[0])
     selectedAgainstAgents.append(allAgents[agentIndex])
     selectedAgainstAgentNames.append(agentNames[agentIndex])
-    againstAgentString.set("Against Agents: " + "\n".join(selectedAgainstAgentNames))
+    againstAgentString.set("Against Agents:\n" + "\n".join(selectedAgainstAgentNames))
     
 
 # Puts updating the graph on a loop
@@ -71,12 +74,20 @@ def startGame():
     envs = []
     for agent in selectedAgainstAgents:
         envs.append(makeGame([selectedAgent, agent], envName))
-    scores = [[] for _ in range(0,len(selectedAgainstAgents))]
-    acumScores = [0 for _ in range(0,len(selectedAgainstAgents))]
-    gamesPlayed = []
+    scores = [[] for _ in enumerate(selectedAgainstAgents)]
+    acumScores = [0 for _ in enumerate(selectedAgainstAgents)]
+    gamesPlayed = [[] for _ in enumerate(selectedAgainstAgents)]
 
-    aniLineChart1 = FuncAnimation(fig, update, frames=range(0,10000), init_func=init, blit=True)
-    aniLineChart2 = FuncAnimation(fig2, update2, frames=range(0,10000), init_func=init2, blit=True)
+    aniLineChart1 = FuncAnimation(fig, update, frames=1, init_func=init, blit=True)
+    aniLineChart2 = FuncAnimation(fig2, update2, frames=1, init_func=init2, blit=True)
+
+# Saves test results
+def saveRun():
+    global gamesPlayed
+    saveTypes = [("JSON Files", "*.json")]
+    toSave = asksaveasfile(filetypes = saveTypes, defaultextension = saveTypes)
+    toSave.write(str(gamesPlayed))
+    toSave.close()
 
 # Runs when graph is initially shown
 def init():
@@ -87,18 +98,19 @@ def update(i):
     global acumScores
     ax.clear()
     for gameNum, env in enumerate(envs):
-        data, newResults = env.run(is_training=False)
-        print(data)
-        print(newResults)
+
+        gameData, newResults = env.run(is_training=False)
         scores[gameNum].append(newResults)
+        gamesPlayed[gameNum].append(gameData)
         acumScores[gameNum] += newResults[1]
+
         line, = ax.plot(range(0,len(scores[gameNum])), [s[1] for s in scores[gameNum]])
-        line.set_label(selectedAgainstAgents[gameNum])
+        line.set_label(selectedAgainstAgentNames[gameNum])
         ax.legend()
         
     # Plotting other agent's rewards, so just a line of 0 for reference
     line, = ax.plot(range(0,len(scores[0])), [0 for _ in scores[0]])
-    line.set_label(selectedAgent)
+    line.set_label(selectedAgentName)
     ax.legend()
     ax.grid('on')
     return ax,
@@ -122,6 +134,7 @@ games = get_all_games()
 
 # Create placeholder for our plot that will be generated below
 root = tk.Tk()
+plt.autoscale()
 
 fig, ax = plt.subplots()
 fig.suptitle("Rewards - 50 games played")
@@ -167,6 +180,7 @@ gameLabel.grid(column=2,row=1)
 agentLabel.grid(column=2, row=2)
 againstAgentLabel.grid(column=2, row=3)
 
-tk.Button(root, text="Start Game", command=startGame).grid(column=3,row=1)
+tk.Button(root, text="Start Game", command=startGame).grid(column=3,row=0)
+tk.Button(root, text="Save Run", command=saveRun).grid(column=3,row=1)
 
 root.mainloop()
