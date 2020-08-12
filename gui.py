@@ -53,7 +53,7 @@ def setGameName(selectedTuple):
     gameString.set("Game: " + envName + "\n")
 
 def setAgentName(selectedTuple):
-    global selectedAgent
+    global selectedAgent, selectedAgentName
     agentIndex = int(selectedTuple[0])
     agentName = agentNames[agentIndex]
     agentString.set("Main Agent: " + agentName + "\n")
@@ -78,8 +78,8 @@ def startGame():
     acumScores = [0 for _ in enumerate(selectedAgainstAgents)]
     gamesPlayed = [[] for _ in enumerate(selectedAgainstAgents)]
 
-    aniLineChart1 = FuncAnimation(fig, update, frames=1, init_func=init, blit=True)
-    aniLineChart2 = FuncAnimation(fig2, update2, frames=1, init_func=init2, blit=True)
+    FuncAnimation(fig, update, frames=1, init_func=init, blit=True)
+    FuncAnimation(fig2, update2, frames=1, init_func=init2, blit=True)
 
 # Saves test results
 def saveRun():
