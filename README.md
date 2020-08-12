@@ -30,8 +30,11 @@ Counterfactional Regret Minimization is a family of learning algorithms for use 
 
 *need new files*
 
+## New agents
+*Need description*
+
 ## Expanded limit holdem and short-limit holdem infoset representation
-In order to expand rlcard to meet the many various computational needs, different infoset representations have been created that encode the game's current state for an agent. The majority of these new representations drop information from the game to allow agents to converge to a strategy faster, at the sake of the strategy not performing as well. 
+In order to expand rlcard to meet the various computational needs of training a model, different infoset representations have been created that encode the game's current state for an agent. The goal for these representations is to increase the speed it takes for a model to learn and converge to a strategy, sometimes at the sake of it not performing as well. 
 
 ### limit holdem infosets
 * default: Improves on the old encoding scheme by packing utilizing suit isomorphisms to vastly lower the overall number of utility scores to calculate. Extremely beneficially for algorithms such as Counterfactual Regret Minimization that traverse all possible states of the game. Details of this scheme can be found [here](https://github.com/jake-bickle/rlcard/issues/11#issuecomment-661328769).
@@ -40,7 +43,7 @@ In order to expand rlcard to meet the many various computational needs, differen
 * old-encoder: The old encoding scheme.
 
 ### short-limit holdem infosets
-These are identical to the limit holdem infosets with the exception that ranks 2-5 are removed.
+* These are identical to the limit holdem infosets with the exception that ranks 2-5 are removed.
 
 Tutorials on utilizing the new infoset representations is written below.
 
@@ -81,7 +84,17 @@ Outside of rlcard-tutorial, datamllab has provided demo code and documentation f
 
 
 ## Utilizing new infoset representations
+_Note: This feature is only available for limit and short limit holdem environments_
 
+You may describe which agent gets which encoding scheme in the config when creating the game environment. Otherwise, the default encoding scheme is used.
+```
+import rlcard
+from rlcard.agents import LimitholdemHumanAgent as HumanAgent
+env = rlcard.make('short-limit-holdem', config={'player_infoset_encoders': ['old-encoder', 'no-flush']})
+player1 = HumanAgent(env.action_num)
+player2 = HumanAgent(env.action_num)
+env.set_agents([player1, player2])
+```
 
 ## Demo
 Run `examples/leduc_holdem_human.py` to play with the pre-trained Leduc Hold'em model. Leduc Hold'em is a simplified version of Texas Hold'em. Rules can be found [here](docs/games.md#leduc-holdem).
