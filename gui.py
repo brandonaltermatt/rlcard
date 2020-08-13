@@ -180,15 +180,9 @@ def update(i):
         gamesPlayed[gameNum].append(gameData)
         acumScores[gameNum] += newResults[1]
 
-        line, = ax.plot(range(0,len(scores[gameNum])), [s[1] for s in scores[gameNum]])
+        line, = ax.plot(range(0,len(scores[gameNum])), [s[0] for s in scores[gameNum]])
         line.set_label(selectedAgainstAgentNames[gameNum])
         ax.legend()
-        
-    # Plotting other agent's rewards, so just a line of 0 for reference
-    line, = ax.plot(range(0,len(scores[0])), [0 for _ in scores[0]])
-    line.set_label(selectedAgentName)
-    ax.legend()
-    ax.grid('on')
     return ax,
 
 def init2():

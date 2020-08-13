@@ -36,10 +36,7 @@ To reset the opponent's list, click the "Clear Agaisnt Agents"
 <img width="500" src="./imgs/GUI_select_other_agents.png" alt="Clear Agents" />
 
 ## Starting Game Play
-Now that all of the agents are ready, click the "Start Game" button.  Two Graphs will be generated.  The graphs
-represent the relative rewards of the agaisnt agents.  The main agent will always be shown as 0, because the agent
-can be playing agaisnt multiple opponents. This mean's other agent's having negative rewards indicates the main
-agent is winning.
+Now that all of the agents are ready, click the "Start Game" button.  Two graphs will be generated (positive numbrers means the main agent is winning)
 
 <img width="500" src="./imgs/GUI_graph.png" alt="Graph" />
 
