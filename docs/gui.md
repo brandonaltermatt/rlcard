@@ -1,4 +1,4 @@
-### A graphical user interface was created to allow for users to test compare the performance of different agents
+### A graphical user interface was created to allow for users to test and compare the performance of different agents
 # User Guide
 ## Launching
 ```
