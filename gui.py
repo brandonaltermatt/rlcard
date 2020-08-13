@@ -1,5 +1,6 @@
 import inspect, sys
 import tkinter as tk
+from tkinter import ttk
 from tkinter.filedialog import asksaveasfile 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -227,7 +228,7 @@ for game in games:
     gameListBox.insert(tk.END, game)
 
 gameListBox.grid(column=0,row=1)
-tk.Button(root, text="Pick A Game", command= lambda: set_game_name(gameListBox.curselection())).grid(column=0,row=2)
+ttk.Button(root, text="Pick A Game", command= lambda: set_game_name(gameListBox.curselection())).grid(column=0,row=2)
 
 # List the agent options
 agentListBox = tk.Listbox(root, width=40, yscrollcommand=1)
@@ -235,9 +236,9 @@ for item in agentNames:
     agentListBox.insert(tk.END, item)
 
 agentListBox.grid(column=1,row=1)
-tk.Button(root, text="Pick Main Agent", command= lambda: set_agent_name(agentListBox.curselection())).grid(column=1,row=2)
-tk.Button(root, text="Add Against Agent", command= lambda: set_against_agent_name(agentListBox.curselection())).grid(column=1,row=3)
-tk.Button(root, text="Clear Against Agents", command= lambda: clear_against_agents()).grid(column=1,row=4)
+ttk.Button(root, text="Pick Main Agent", command= lambda: set_agent_name(agentListBox.curselection())).grid(column=1,row=2)
+ttk.Button(root, text="Add Against Agent", command= lambda: set_against_agent_name(agentListBox.curselection())).grid(column=1,row=3)
+ttk.Button(root, text="Clear Against Agents", command= lambda: clear_against_agents()).grid(column=1,row=4)
 
 # Display the information about the current game
 statusString = tk.StringVar()
@@ -245,7 +246,7 @@ statusLabel = tk.Label(root, textvariable=statusString)
 statusLabel.grid(column=2,row=1)
 update_status_string()
 
-tk.Button(root, text="Start Game", command=startGame).grid(column=2,row=2)
-tk.Button(root, text="Save Run", command=saveRun).grid(column=2,row=3)
+ttk.Button(root, text="Start Game", command=startGame).grid(column=2,row=2)
+ttk.Button(root, text="Save Run", command=saveRun).grid(column=2,row=3)
 
 root.mainloop()
