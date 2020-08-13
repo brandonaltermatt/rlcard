@@ -15,5 +15,5 @@ class OneLookModelShortHoldem(LimitholdemRuleModelV1):
         self.game = "short-limit-holdem"
         env = rlcard.make(self.game)
 
-        rule_agent = OneLookAgent(env.action_num)
+        rule_agent = OneLookAgent()
         self.rule_agents = [rule_agent for _ in range(env.player_num)]
