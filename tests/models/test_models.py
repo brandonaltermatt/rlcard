@@ -1,5 +1,6 @@
 import unittest
 
+from rlcard.models.registration import model_registry
 from rlcard.models.model import Model
 from rlcard.models.pretrained_models import LeducHoldemNFSPModel, LeducHoldemNFSPPytorchModel, LeducHoldemCFRModel
 from rlcard.models.leducholdem_rule_models import LeducHoldemRuleModelV1, LeducHoldemRuleModelV2
@@ -8,7 +9,8 @@ from rlcard.models.limitholdem_rule_models import LimitholdemRuleModelV1
 from rlcard.models.doudizhu_rule_models import DouDizhuRuleModelV1
 
 from rlcard.models.gin_rummy_rule_models import GinRummyNoviceRuleModel
-
+import rlcard
+from rlcard.utils.utils import tournament
 
 class TestModel(unittest.TestCase):
 
@@ -122,6 +124,20 @@ class TestModel(unittest.TestCase):
         self.assertIsInstance(model, GinRummyNoviceRuleModel)
         self.assertIsInstance(model.agents, list)
 
+    def test_run_all_models(self):
+        allAgents = []
+        for agent in model_registry.model_specs.values():
+            allAgents.append(agent.load())
+        for a1 in allAgents:
+            for a2 in allAgents:
+                if hasattr(a1, "game") and hasattr(a2, "game"):
+                    pass
+                else:
+                    continue
+                if a1.game == a2.game:
+                    env = rlcard.make(a1.game)
+                    if env.player_num == 2:
+                        env.set_agents([a1.agents[0],a2.agents[1]])
 
 if __name__ == '__main__':
     unittest.main()

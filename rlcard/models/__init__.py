@@ -50,3 +50,19 @@ register(
 register(
     model_id='gin-rummy-novice-rule',
     entry_point='rlcard.models.gin_rummy_rule_models:GinRummyNoviceRuleModel')
+
+register(
+    model_id='blackjack-random',
+    entry_point='rlcard.models.random_models:RandomModelBlackJack')
+
+register(
+    model_id='doudizhu-random',
+    entry_point='rlcard.models.random_models:RandomModelDoudizhu')
+
+register(
+    model_id='short-limit-holdem-random',
+    entry_point='rlcard.models.random_models:RandomModelShortLimitHoldem')
+
+register(
+    model_id='short-limit-holdem-one-look',
+    entry_point='rlcard.models.one_look_models:OneLookModelShortHoldem')

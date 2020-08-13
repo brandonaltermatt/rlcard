@@ -86,7 +86,11 @@ class LeducHoldemRuleAgentV2(object):
                 return 'raise'
             else:
                 return action
-
+                
+    def eval_step(self, state):
+        ''' Step for evaluation. The same to step
+        '''
+        return self.step(state), []
 class LeducHoldemRuleModelV1(Model):
     ''' Leduc holdem Rule Model version 1
     '''
@@ -94,7 +98,8 @@ class LeducHoldemRuleModelV1(Model):
     def __init__(self):
         ''' Load pretrained model
         '''
-        env = rlcard.make('leduc-holdem')
+        self.game = 'leduc-holdem'
+        env = rlcard.make(self.game)
         rule_agent = LeducHoldemRuleAgentV1()
         self.rule_agents = [rule_agent for _ in range(env.player_num)]
 
@@ -117,7 +122,8 @@ class LeducHoldemRuleModelV2(Model):
     def __init__(self):
         ''' Load pretrained model
         '''
-        env = rlcard.make('leduc-holdem')
+        self.game = 'leduc-holdem'
+        env = rlcard.make(self.game)
         rule_agent = LeducHoldemRuleAgentV2()
         self.rule_agents = [rule_agent for _ in range(env.player_num)]
 
