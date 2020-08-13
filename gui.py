@@ -23,18 +23,31 @@ ax = None
 ax2 = None
 
 # Global user selction placeholders
-selectedAgent = None
-selectedAgentName = None
-envName = None
+selectedAgent = ""
+selectedAgentName = ""
+envName = ""
 selectedAgainstAgents = []
 selectedAgainstAgentNames = []
 
-# Finds the name of all the different games supported
-# Returns list of strings
 def get_all_games():
+    ''' Finds all registered games
+
+    returns:
+        games (string): name of gamees available
+    '''
     return list(EnvReg.registry.env_specs.keys())
 
 def get_all_trained_agents(gameName=None):
+    ''' Checks for all registered pre-trained agents
+
+    args:
+        gameName (string): optional. Will only return agents trained
+            for the game specified. Has to be an exact match.
+
+    returns:
+        Agents (list of object): list of agent objects
+        Agent Names (List of string): agent's name
+    '''
     allAgents = []
     agentNames = []
     for agent in ModelReg.model_registry.model_specs.values():
@@ -43,69 +56,120 @@ def get_all_trained_agents(gameName=None):
             allAgents.append(agent.load().agents[0]) # assumes player is P1
     return (allAgents, agentNames)
 
-# Binds a game with its players
-def makeGame(players, gameName):
+def make_game(players, gameName):
+    ''' Creates an enviorment for tournament play.
+
+    args:
+        players (list of agents): Agent's to play
+        gameName (string): name of the game to play
+
+    returns:
+        env (Env): Game that is ready to play
+    '''
     env = rlcard.make(gameName)
     env.set_agents(players)
     return env
 
-# Store the user selected game and agent in variables, update the status bar
-def setGameName(selectedTuple):
+def set_game_name(selectedTuple):
+    ''' Called when user selects a game to play.  Also, Updates display string.
+
+    args:
+        selectedTuple (int): index into the game options list
+    '''    
     global envName
     gameIndex = int(selectedTuple[0])
     envName = games[gameIndex]
-    gameString.set("Game: " + envName + "\n")
+    update_status_string()
 
-def setAgentName(selectedTuple):
+def set_agent_name(selectedTuple):
+    ''' Called when user selects a main agent.  Also, Updates display string.
+
+    args:
+        selectedTuple (int): index into the agent options list
+    '''   
     global selectedAgent, selectedAgentName
     agentIndex = int(selectedTuple[0])
-    agentName = agentNames[agentIndex]
-    agentString.set("Main Agent: " + agentName + "\n")
     selectedAgent = allAgents[agentIndex]
     selectedAgentName = agentNames[agentIndex]
+    update_status_string()
 
-def setAgainstAgentName(selectedTuple):
+def set_against_agent_name(selectedTuple):
+    ''' Called when user selects an agent to play against.  Also, Updates display string.
+
+    args:
+        selectedTuple (int): index into the agent options list
+    '''   
     global selectedAgainstAgents, selectedAgainstAgentNames
     agentIndex = int(selectedTuple[0])
     selectedAgainstAgents.append(allAgents[agentIndex])
     selectedAgainstAgentNames.append(agentNames[agentIndex])
-    againstAgentString.set("Against Agents:\n" + "\n".join(selectedAgainstAgentNames))
+    update_status_string()
     
+def clear_against_agents():
+    ''' Called when user clears selected agents.  Also, Updates display string.
+    '''  
+    global selectedAgainstAgents, selectedAgainstAgentNames
+    selectedAgainstAgents = []
+    selectedAgainstAgentNames = []
+    update_status_string()
 
-# Puts updating the graph on a loop
+def update_status_string():
+    ''' Called when user clears selected agents.  Also, Updates display string.
+    '''  
+    global statusString, selectedAgentName, selectedAgainstAgentNames, envName
+    statusString.set("Game:\n" + envName + "\nMain Agent:\n" + selectedAgentName +
+        "\nAgainst Agents:\n" + "\n".join(selectedAgainstAgentNames))
+
 def startGame():
+    ''' Called when user clicks start game.  Kicks off chart animations.
+    '''  
     global scores, acumScores, envs, gamesPlayed, fig, fig2, ax, ax2
     envs = []
     for agent in selectedAgainstAgents:
-        envs.append(makeGame([selectedAgent, agent], envName))
+        envs.append(make_game([selectedAgent, agent], envName))
     scores = [[] for _ in enumerate(selectedAgainstAgents)]
     acumScores = [0 for _ in enumerate(selectedAgainstAgents)]
     gamesPlayed = [[] for _ in enumerate(selectedAgainstAgents)]
 
     fig = plt.figure()
     ax = plt.axes()
-    fig.suptitle("Rewards - 50 games played")
+    # ax.set_ylim(-1,1)
+    fig.suptitle("Rewards Per Game")
     fig2 = plt.figure()
     ax2 = plt.axes()
-    fig2.suptitle("Accumulative rewards")
+    # ax2.autoscale()
+    fig2.suptitle("Accumulative Rewards")
 
     FuncAnimation(fig, update, init_func=init, blit=True, frames=200, interval=20)
     FuncAnimation(fig2, update2, init_func=init2, blit=True, frames=200, interval=20)
     plt.show()
-# Saves test results
+
 def saveRun():
+    ''' Called when user clicks the save button.  Dumps all of the raw game data in
+        a JSON format.
+    '''  
     global gamesPlayed
     saveTypes = [("JSON Files", "*.json")]
     toSave = asksaveasfile(filetypes = saveTypes, defaultextension = saveTypes)
     toSave.write(str(gamesPlayed))
     toSave.close()
 
-# Runs when graph is initially shown
 def init():
+    ''' Required for FuncAnimation.  Just returns the original axes
+
+        returns:
+            axes (Axes): the original axes
+    '''  
     return ax,
 
-# Runs every iteration. i Is the iteration count
 def update(i):
+    ''' Generates the next game of data, and updates the per game graph
+
+        args:
+            i (int): current iteration number
+        returns:
+            axes (Axes): the original axes
+    '''  
     global acumScores
     ax.clear()
     for gameNum, env in enumerate(envs):
@@ -126,16 +190,27 @@ def update(i):
     ax.grid('on')
     return ax,
 
-# Runs when graph is initially shown
 def init2():
+    ''' Required for FuncAnimation.  Just returns the original axes
+
+        returns:
+            axes (Axes): the original axes
+    '''  
     return ax2,
 
-# Runs every iteration. i Is the iteration count
 def update2(i):
+    ''' Generates the next game of data, and updates the acumulative graph.
+
+        args:
+            i (int): current iteration number
+        returns:
+            axes (Axes): the original axes
+    '''  
     global acumScores
     ax2.clear()
-    ax2.bar(selectedAgainstAgentNames, acumScores)
+    ax2.bar(selectedAgainstAgentNames, acumScores, label=selectedAgainstAgentNames)
     ax2.grid('on')
+    ax2.legend(labels=selectedAgainstAgentNames)
     return ax2,
 
 
@@ -152,7 +227,7 @@ for game in games:
     gameListBox.insert(tk.END, game)
 
 gameListBox.grid(column=0,row=1)
-tk.Button(root, text="Pick A Game", command= lambda: setGameName(gameListBox.curselection())).grid(column=0,row=2)
+tk.Button(root, text="Pick A Game", command= lambda: set_game_name(gameListBox.curselection())).grid(column=0,row=2)
 
 # List the agent options
 agentListBox = tk.Listbox(root, width=40, yscrollcommand=1)
@@ -160,27 +235,17 @@ for item in agentNames:
     agentListBox.insert(tk.END, item)
 
 agentListBox.grid(column=1,row=1)
-tk.Button(root, text="PickMainAgent", command= lambda: setAgentName(agentListBox.curselection())).grid(column=1,row=2)
-tk.Button(root, text="AddAgainstAgents", command= lambda: setAgainstAgentName(agentListBox.curselection())).grid(column=1,row=3)
+tk.Button(root, text="Pick Main Agent", command= lambda: set_agent_name(agentListBox.curselection())).grid(column=1,row=2)
+tk.Button(root, text="Add Against Agent", command= lambda: set_against_agent_name(agentListBox.curselection())).grid(column=1,row=3)
+tk.Button(root, text="Clear Against Agents", command= lambda: clear_against_agents()).grid(column=1,row=4)
 
 # Display the information about the current game
-gameString = tk.StringVar()
-agentString = tk.StringVar()
-againstAgentString = tk.StringVar()
+statusString = tk.StringVar()
+statusLabel = tk.Label(root, textvariable=statusString)
+statusLabel.grid(column=2,row=1)
+update_status_string()
 
-gameLabel = tk.Label(root, textvariable=gameString)
-agentLabel = tk.Label(root, textvariable=agentString)
-againstAgentLabel = tk.Label(root, textvariable=againstAgentString)
-
-gameString.set("Game: ")
-agentString.set("Main Agent: ")
-againstAgentString.set("Against Agents: ")
-
-gameLabel.grid(column=2,row=1)
-agentLabel.grid(column=2, row=2)
-againstAgentLabel.grid(column=2, row=3)
-
-tk.Button(root, text="Start Game", command=startGame).grid(column=3,row=0)
-tk.Button(root, text="Save Run", command=saveRun).grid(column=3,row=1)
+tk.Button(root, text="Start Game", command=startGame).grid(column=2,row=2)
+tk.Button(root, text="Save Run", command=saveRun).grid(column=2,row=3)
 
 root.mainloop()
