@@ -21,7 +21,9 @@ Edited files: limitholdem.py
 Running gui.py provides an easy-to-use graphical user interface where you can quickly compare pre-trained models or hueristic based agents against each other. Two graphs show the rewards they earn each game and how much each win on average.
 
 New files: gui.py
-<img width="500" src="./docs/imgs/GUI_graph.png" alt="Other Agents" />
+
+<img width="500" src="./docs/imgs/GUI_graph.png" alt="Graph" />
+
 ### Launching
 ```
 python gui.py
