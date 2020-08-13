@@ -19,10 +19,15 @@ Edited files: limitholdem.py
 
 ## Graphical Interface for comparaing agents
 Running gui.py provides an easy-to-use graphical user interface where you can quickly compare pre-trained models or hueristic based agents against each other. Two graphs show the rewards they earn each game and how much each win on average.
-*picture needed*
 
 New files: gui.py
-
+<img width="500" src="./docs/imgs/GUI_graph.png" alt="Other Agents" />
+### Launching
+```
+python gui.py
+```
+### More information
+See /docs/gui.md
 
 
 ## Expansion of CFR Algorithm
