@@ -37,7 +37,7 @@ Counterfactional Regret Minimization is a family of learning algorithms for use 
 In order to expand rlcard to meet the various computational needs of training a model, different infoset representations have been created that encode the game's current state for an agent. The goal for these representations is to increase the speed it takes for a model to learn and converge to a strategy, sometimes at the sake of it not performing as well. 
 
 ### limit holdem infosets
-* default: Improves on the old encoding scheme by packing utilizing suit isomorphisms to vastly lower the overall number of utility scores to calculate. Extremely beneficially for algorithms such as Counterfactual Regret Minimization that traverse all possible states of the game. Details of this scheme can be found [here](https://github.com/jake-bickle/rlcard/issues/11#issuecomment-661328769).
+* default: Improves on the old encoding scheme by packing utilizing suit isomorphisms to vastly lower the overall number of utility scores to calculate. Extremely beneficially for algorithms such as Counterfactual Regret Minimization that traverse all possible states of the game. Details of this scheme can be found [here](https://github.com/jake-bickle/rlcard/issues/11#issuecomment-661328769). Much of the ideas to create this scheme was formulated by this [paper](https://www.cs.cmu.edu/~./kwaugh/publications/isomorphism13.pdf).
 * no-hole: Same as default, except any information related to the hole (private) cards are removed
 * no-flush: Same as default, except any information related to card suits are removed
 * old-encoder: The old encoding scheme.
