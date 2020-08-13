@@ -130,11 +130,14 @@ class TestModel(unittest.TestCase):
             allAgents.append(agent.load())
         for a1 in allAgents:
             for a2 in allAgents:
+                if hasattr(a1, "game") and hasattr(a2, "game"):
+                    pass
+                else:
+                    continue
                 if a1.game == a2.game:
                     env = rlcard.make(a1.game)
                     if env.player_num == 2:
                         env.set_agents([a1.agents[0],a2.agents[1]])
-                        print(tournament(env, 1))
 
 if __name__ == '__main__':
     unittest.main()
