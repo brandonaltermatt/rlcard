@@ -1,115 +1,100 @@
 # Auto-Cardshark: Experimental Poker AI for Short-deck Limit Holdem
-This is an experimental learning project by students at Portland State University, using and exapnding the RLCard toolkit to develop and test learning algorthims for a poker game. 
-Team members: Johnny Neckar, Jacob Bickle, Joseph Devlin, Yubin Fan, Brandon Altermatt
-
-# Short-deck Limit Holdem Implementation
-The toolkit has been expanded to include a new poker game, short-deck holdem. Short-deck is a holdem variation which uses a 36 card deck instead of a full 52 card deck. The smaller deck size significantly reduces complexity of the game tree, making it a useful candidate for running experimention on poker games with limited computational resources. In contrast to toy poker games such like Kuhn and Leduc, short-deck retains the strategic depth and complexity of holdem, while still significantly reducing computational cost by shrinking the state-space.
-
-
-# Graphical Interface for Running Experiments
-
-
-
-
-
-# Expansion of CFR Algorithm
-Counterfactional Regret Minimization is a family of learning algorithms for use in games with imperfect information. Traditional learning algorithms such as Mini-max and Q-Learning are unstable in multiagent games with imperfect information. CFR was the first algorithm to achieve super-human performance in full scale poker games, developing a strategy that is capable of bluffing and deception and robust to opponents which are actively attempting to exploit it. It is however very computationally expensive in large poker games (Cepheus, the agent which developed an approximate solution to 2 player limitholdem, trained for 68 days on 4800 CPUs). Much research has been done on developing modifications and optimizations to the original CFR algorithm. The RLCard toolkit includes an implementation of vanilla-CFR, which the project attempts to expand with some of these improvements.
-
-
-# Additional Algorithm Development
-
-
-
-
-The full readme for the RLCard toolkit is below.
-
-# RLCard: A Toolkit for Reinforcement Learning in Card Games
 <img width="500" src="./docs/imgs/logo.jpg" alt="Logo" />
 
 [![Build Status](https://travis-ci.org/datamllab/RLCard.svg?branch=master)](https://travis-ci.org/datamllab/RLCard)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/248eb15c086748a4bcc830755f1bd798)](https://www.codacy.com/manual/daochenzha/rlcard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=datamllab/rlcard&amp;utm_campaign=Badge_Grade)
 [![Coverage Status](https://coveralls.io/repos/github/datamllab/rlcard/badge.svg)](https://coveralls.io/github/datamllab/rlcard?branch=master)
 
-RLCard is a toolkit for Reinforcement Learning (RL) in card games. It supports multiple card environments with easy-to-use interfaces. The goal of RLCard is to bridge reinforcement learning and imperfect information games. RLCard is developed by [DATA Lab](http://faculty.cs.tamu.edu/xiahu/) at Texas A&M University and community contributors.
+This is an experimental learning project by students at Portland State University, using and exapnding the RLCard toolkit to develop and test learning algorthims for a poker game. 
+Team members: Johnny Neckar, Jacob Bickle, Joseph Devlin, Yubin Fan, Brandon Altermatt
 
-*   Official Website: [http://www.rlcard.org](http://www.rlcard.org)
-*   Tutorial in Jupyter Notebook: [https://github.com/datamllab/rlcard-tutorial](https://github.com/datamllab/rlcard-tutorial)
-*   Paper: [https://arxiv.org/abs/1910.04376](https://arxiv.org/abs/1910.04376)
-*   Resources: [Awesome-Game-AI](https://github.com/datamllab/awesome-game-ai)
+# New Features
+## Short-deck Limit Holdem Implementation
+The toolkit has been expanded to include a new poker game, short-deck holdem. Short-deck is a holdem variation which uses a 36 card deck instead of a full 52 card deck. The smaller deck size significantly reduces complexity of the game tree, making it a useful candidate for running experimention on poker games with limited computational resources. In contrast to toy poker games such like Kuhn and Leduc, short-deck retains the strategic depth and complexity of holdem, while still significantly reducing computational cost by shrinking the state-space.
 
-**News:**
-*   Jupyter Notebook tutorial available! We add some examples in R to call Python interfaces of RLCard with reticulate. See [here](docs/toy-examples-r.md)
-*   Thanks for the contribution of [@Clarit7](https://github.com/Clarit7) for supporting different number of players in Blackjack. We call for contributions for gradually making the games more configurable. See [here](CONTRIBUTING.md#making-configurable-environments) for more details.
-*   Thanks for the contribution of [@Clarit7](https://github.com/Clarit7) for the Blackjack and Limit Hold'em human interface.
-*   Now RLCard supports environment local seeding and multiprocessing. Thanks for the testing scripts provided by [@weepingwillowben](https://github.com/weepingwillowben).
-*   Human interface of NoLimit Holdem available. The action space of NoLimit Holdem has been abstracted. Thanks for the contribution of [@AdrianP-](https://github.com/AdrianP-).
-*   New game Gin Rummy and human GUI available. Thanks for the contribution of [@billh0420](https://github.com/billh0420).
-*   PyTorch implementation available. Thanks for the contribution of [@mjudell](https://github.com/mjudell).
+New files: shortlimitholdem.py
 
-## Cite this work
-If you find this repo useful, you may cite:
-```bibtex
-@article{zha2019rlcard,
-  title={RLCard: A Toolkit for Reinforcement Learning in Card Games},
-  author={Zha, Daochen and Lai, Kwei-Herng and Cao, Yuanpu and Huang, Songyi and Wei, Ruzhe and Guo, Junyu and Hu, Xia},
-  journal={arXiv preprint arXiv:1910.04376},
-  year={2019}
-}
+Edited files: limitholdem.py
+
+
+## Graphical Interface for comparaing agents
+Running gui.py provides an easy-to-use graphical user interface where you can quickly compare pre-trained models or hueristic based agents against each other. Two graphs show the rewards they earn each game and how much each win on average.
+*picture needed*
+
+New files: gui.py
+
+
+
+## Expansion of CFR Algorithm
+Counterfactional Regret Minimization is a family of learning algorithms for use in games with imperfect information. Traditional learning algorithms such as Mini-max and Q-Learning are unstable in multiagent games with imperfect information. CFR was the first algorithm to achieve super-human performance in full scale poker games, developing a strategy that is capable of bluffing and deception and robust to opponents which are actively attempting to exploit it. It is however very computationally expensive in large poker games (Cepheus, the agent which developed an approximate solution to 2 player limitholdem, trained for 68 days on 4800 CPUs). Much research has been done on developing modifications and optimizations to the original CFR algorithm. The RLCard toolkit includes an implementation of vanilla-CFR, which the project attempts to expand with some of these improvements.
+
+*need new files*
+
+## New agents
+*Need description*
+
+## Expanded limit holdem and short-limit holdem infoset representation
+In order to expand rlcard to meet the various computational needs of training a model, different infoset representations have been created that encode the game's current state for an agent. The goal for these representations is to increase the speed it takes for a model to learn and converge to a strategy, sometimes at the sake of it not performing as well. 
+
+### limit holdem infosets
+* default: Improves on the old encoding scheme by packing utilizing suit isomorphisms to vastly lower the overall number of utility scores to calculate. Extremely beneficially for algorithms such as Counterfactual Regret Minimization that traverse all possible states of the game. Details of this scheme can be found [here](https://github.com/jake-bickle/rlcard/issues/11#issuecomment-661328769).
+* no-hole: Same as default, except any information related to the hole (private) cards are removed
+* no-flush: Same as default, except any information related to card suits are removed
+* old-encoder: The old encoding scheme.
+
+### short-limit holdem infosets
+* These are identical to the limit holdem infosets with the exception that ranks 2-5 are removed.
+
+Tutorials on utilizing the new infoset representations is written below.
+
+New files: \_limitholdem\_infoset\_encoders.py, \_shortlimitholdem\_infoset\_encoders.py
+Edited files: limitholdem.py, shortlimitholdem.py
+
+
+# Installation
+Make sure that you have **Python 3.5+** and **pip** to install the requirements. This code is not available on pypi, so you'll have to download from source. The following commands will provide the source code and the requirements to run it.
+
 ```
-
-## Installation
-Make sure that you have **Python 3.5+** and **pip** installed. We recommend installing the latest version of `rlcard` with `pip`:
-
-```
-git clone https://github.com/datamllab/rlcard.git
+git clone https://github.com/jake-bickle/rlcard.git
 cd rlcard
 pip install -e .
 ```
-Alternatively, you can install the latest stable version with:
-```
-pip install rlcard
-```
-The default installation will only include the card environments. To use Tensorflow implementation of the example algorithms, install the supported verison of Tensorflow with:
+
+The default installation does not include all available algorithms. Optionally, you may install the supported version of Tensorflow from datamllab's rlcard with:
 ```
 pip install rlcard[tensorflow]
 ```
+
 To try PyTorch implementations, please run: 
 ```
 pip install rlcard[torch]
 ```
 If you meet any problems when installing PyTorch with the command above, you may follow the instructions on [PyTorch official website](https://pytorch.org/get-started/locally/) to manually install PyTorch.
 
-We also provide [**conda** installation method](https://anaconda.org/toubun/rlcard):
+# Running
+The majority of this code is run the same way as datamllab's code. A link to the official tutorial can be found [here] (https://github.com/datamllab/rlcard-tutorial). An addition, there are an ample amount of examples in the `examples` directory, including the file `short_limit_holdem_infoset_representation.py`, to utilize the new features introduced in this fork.
 
+Outside of rlcard-tutorial, datamllab has provided demo code and documentation for utilizing rlcard to its fullest capacity below.
+
+
+# Support datamllab
+*   Official Website: [http://www.rlcard.org](http://www.rlcard.org)
+*   Paper: [https://arxiv.org/abs/1910.04376](https://arxiv.org/abs/1910.04376)
+*   Resources: [Awesome-Game-AI](https://github.com/datamllab/awesome-game-ai)
+
+
+## Utilizing new infoset representations
+_Note: This feature is only available for limit and short limit holdem environments_
+
+You may describe which agent gets which encoding scheme in the config when creating the game environment. Otherwise, the default encoding scheme is used.
 ```
-conda install -c toubun rlcard
-```
-
-Conda installation only provides the card environments, you need to manually install Tensorflow or Pytorch on your demands.
-
-## Examples
-Please refer to [examples/](examples). A **short example** is as below.
-
-```python
 import rlcard
-from rlcard.agents import RandomAgent
-
-env = rlcard.make('blackjack')
-env.set_agents([RandomAgent(action_num=env.action_num)])
-
-trajectories, payoffs = env.run()
+from rlcard.agents import LimitholdemHumanAgent as HumanAgent
+env = rlcard.make('short-limit-holdem', config={'player_infoset_encoders': ['old-encoder', 'no-flush']})
+player1 = HumanAgent(env.action_num)
+player2 = HumanAgent(env.action_num)
+env.set_agents([player1, player2])
 ```
-
-We also recommend the following **toy examples** in Python.
-
-*   [Playing with random agents](docs/toy-examples.md#playing-with-random-agents)
-*   [Deep-Q learning on Blackjack](docs/toy-examples.md#deep-q-learning-on-blackjack)
-*   [Running multiple processes](docs/toy-examples.md#running-multiple-processes)
-*   [Training CFR on Leduc Hold'em](docs/toy-examples.md#training-cfr-on-leduc-holdem)
-*   [Having fun with pretrained Leduc model](docs/toy-examples.md#having-fun-with-pretrained-leduc-model)
-*   [Leduc Hold'em as single-agent environment](docs/toy-examples.md#leduc-holdem-as-single-agent-environment)
-
-R examples can be found [here](docs/toy-examples-r.md).
 
 ## Demo
 Run `examples/leduc_holdem_human.py` to play with the pre-trained Leduc Hold'em model. Leduc Hold'em is a simplified version of Texas Hold'em. Rules can be found [here](docs/games.md#leduc-holdem).
@@ -225,11 +210,6 @@ For your information, there is a nice online evaluation platform [pokerwars](htt
 ## More Documents
 For more documentation, please refer to the [Documents](docs/README.md) for general introductions. API documents are available at our [website](http://www.rlcard.org).
 
-## Contributing
-Contribution to this project is greatly appreciated! Please create an issue for feedbacks/bugs. If you want to contribute codes, please refer to [Contributing Guide](./CONTRIBUTING.md).
-
-## Acknowledgements
-We would like to thank JJ World Network Technology Co.,LTD for the generous support and all the contributions from the community contributors.
 
 ## License
 This work is released under the MIT License.
