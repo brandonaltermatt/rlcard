@@ -17,6 +17,10 @@ envs = None
 scores = None
 acumScores = None
 gamesPlayed = None
+fig = None
+fig2 = None
+ax = None
+ax2 = None
 
 # Global user selction placeholders
 selectedAgent = None
@@ -70,7 +74,7 @@ def setAgainstAgentName(selectedTuple):
 
 # Puts updating the graph on a loop
 def startGame():
-    global scores, acumScores, envs, gamesPlayed
+    global scores, acumScores, envs, gamesPlayed, fig, fig2, ax, ax2
     envs = []
     for agent in selectedAgainstAgents:
         envs.append(makeGame([selectedAgent, agent], envName))
@@ -78,9 +82,16 @@ def startGame():
     acumScores = [0 for _ in enumerate(selectedAgainstAgents)]
     gamesPlayed = [[] for _ in enumerate(selectedAgainstAgents)]
 
-    FuncAnimation(fig, update, frames=1, init_func=init, blit=True)
-    FuncAnimation(fig2, update2, frames=1, init_func=init2, blit=True)
+    fig = plt.figure()
+    ax = plt.axes()
+    fig.suptitle("Rewards - 50 games played")
+    fig2 = plt.figure()
+    ax2 = plt.axes()
+    fig2.suptitle("Accumulative rewards")
 
+    FuncAnimation(fig, update, init_func=init, blit=True, frames=200, interval=20)
+    FuncAnimation(fig2, update2, init_func=init2, blit=True, frames=200, interval=20)
+    plt.show()
 # Saves test results
 def saveRun():
     global gamesPlayed
@@ -134,17 +145,6 @@ games = get_all_games()
 
 # Create placeholder for our plot that will be generated below
 root = tk.Tk()
-plt.autoscale()
-
-fig, ax = plt.subplots()
-fig.suptitle("Rewards - 50 games played")
-canvas = FigureCanvasTkAgg(fig, master=root)
-canvas.get_tk_widget().grid(column=0,row=5, columnspan=2)
-
-fig2, ax2 = plt.subplots()
-fig2.suptitle("Accumulative rewards")
-canvas2 = FigureCanvasTkAgg(fig2, master=root)
-canvas2.get_tk_widget().grid(column=2,row=5)
 
 # List the game modes
 gameListBox = tk.Listbox(root, yscrollcommand=1)
