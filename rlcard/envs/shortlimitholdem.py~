@@ -1,6 +1,5 @@
 import os
 import numpy as np
-
 from rlcard.envs.limitholdem import LimitholdemEnv, LimitHoldemInfosetEncoder
 from rlcard.games.shortlimitholdem import Game
 
