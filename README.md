@@ -12,7 +12,7 @@ Team members: Johnny Neckar, Jacob Bickle, Joseph Devlin, Yubin Fan, Brandon Alt
 ## Short-deck Limit Holdem Implementation
 The toolkit has been expanded to include a new poker game, short-deck holdem. Short-deck is a holdem variation which uses a 36 card deck instead of a full 52 card deck. The smaller deck size significantly reduces complexity of the game tree, making it a useful candidate for running experimention on poker games with limited computational resources. In contrast to toy poker games such like Kuhn and Leduc, short-deck retains the strategic depth and complexity of holdem, while still significantly reducing computational cost by shrinking the state-space.
 
-New files: [game folder](/rlcard/games/shortlimitholdem)
+New files: [game folder](/rlcard/games/shortlimitholdem)\
 		   [environment file](/rlcard/envs/shortlimitholdem.py)
 
 Edited files: [limitholdem.py](/rlcard/envs/limitholdem.py)
@@ -38,10 +38,11 @@ Counterfactional Regret Minimization is a family of learning algorithms for use 
 
 *need new files*
 
+
 ## Other Rule-based Agents
 We developed two rule-based agents except the trained agent by CFR algorithm. One agent follows defensivee rules: At the begining, it raises only if its hand cards have "good" combinations (e.g. pairs, a combination from A to 10). After community cards showed, it searches for the best combo between its hand cards and community cards. If the expected flush or straight or triple does  not exist, it will fold. Another agent follows a simple aggressive rule: it raise anytime whatever its hand cards are. 
 
-File of agents: [shortlimitholdem_rule_models.py](/rlcard/rlcard/models/shortlimitholdem_rule_models.py)
+File of agents: [shortlimitholdem_rule_models.py](/rlcard/rlcard/models/shortlimitholdem_rule_models.py)\
 A simple example to play with the rule-based agents: [short_limit_holdem_human.py](/rlcard/examples/short_limit_holdem_human.py)
 
 
