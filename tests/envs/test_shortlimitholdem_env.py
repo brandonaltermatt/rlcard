@@ -1,6 +1,8 @@
 import unittest
+import numpy as np
 
 import rlcard
+import rlcard.envs._shortlimitholdem_infoset_encoders as encoders
 from rlcard.agents.random_agent import RandomAgent
 from .determism_util import is_deterministic
 
@@ -72,6 +74,44 @@ class TestShortlimitholdemEnv(unittest.TestCase):
         env = rlcard.make('short-limit-holdem')
         _, player_id = env.reset()
         self.assertEqual(player_id, env.get_perfect_information()['current_player'])
+
+class TestShortLimitHoldemInfosetEncoder(unittest.TestCase):
+    def test_correct_state_shape(self):
+        self.assertEqual(encoders.ShortLimitHoldemInfosetEncoder.STATE_SHAPE, [62])
+
+    def test_encode_full_game(self):
+        state = {'hand': ['S6', 'S7'], 'public_cards': ['S8', 'S9', 'ST', 'H7', 'H6'], 'player_id': 0}
+        action_record = [
+            [0, 'call'], [1, 'check'],
+            [0, 'check'], [1, 'check'],
+            [0, 'raise'], [1, 'call'],
+            [0, 'raise'], [1, 'raise'], [0, 'raise'], [1, 'raise'], [0, 'call']
+        ]
+        e = encoders.ShortLimitHoldemInfosetEncoder()
+        expected_result = np.array([
+            # Suits
+            1.,
+            1., 0.,
+            0., 0.,
+            1., 1.,
+            0., 0.,
+            # Bets
+            0., 0., 0., 0.,
+            0., 0., 0., 0.,
+            0., 0., 1., 0.,
+            1., 0., 0., 1.,
+            # Cards
+            1., 1., 0., 0., 0., 0., 0., 0., 0.,
+            0., 0., 1., 1., 1., 0., 0., 0., 0.,
+            0,
+            0., 1., 0., 0., 0., 0., 0., 0., 0.,
+            1., 0., 0., 0., 0., 0., 0., 0., 0.,
+        ])
+        result = e.encode(state, action_record)
+        self.assertEqual(len(result), encoders.ShortLimitHoldemInfosetEncoder.STATE_SIZE)
+        self.assertTrue(np.array_equal(expected_result[0:9], result[0:9]))  # Suits encoded correctly
+        self.assertTrue(np.array_equal(expected_result[9:25], result[9:25]))  # Bets encoded correctly
+        self.assertTrue(np.array_equal(expected_result[25:], result[25:]))  # Ranks encoded correctly
 
 if __name__ == '__main__':
     unittest.main()

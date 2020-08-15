@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 
 import rlcard
-from rlcard.envs.limitholdem import LimitHoldemInfosetEncoder
+from rlcard.envs._limitholdem_infoset_encoders import LimitHoldemInfosetEncoder, NoFlushEncoder, NoHoleEncoder, OldLimitHoldemInfosetEncoder
 from rlcard.agents.random_agent import RandomAgent
 from .determism_util import is_deterministic
 
@@ -76,7 +76,33 @@ class TestLimitholdemEnv(unittest.TestCase):
         _, player_id = env.reset()
         self.assertEqual(player_id, env.get_perfect_information()['current_player'])
 
+    def test_differing_extract_state_obs(self):
+        env = rlcard.make('limit-holdem', config={'player_infoset_encoders': ['default', 'no-flush']})
+        sample_player0_state = {
+            'player_id': 0,
+            'raws_obs': [],
+            'legal_actions': ['call', 'raise', 'fold'],
+            'action_record': [],
+            'hand': ['S3', 'S4'],
+            'public_cards': [],
+        }
+        sample_player1_state = {
+            'player_id': 1,
+            'raws_obs': [],
+            'legal_actions': ['call', 'raise', 'fold'],
+            'action_record': [],
+            'hand': ['S6', 'S5'],
+            'public_cards': [],
+        }
+        player0_obs = env._extract_state(sample_player0_state)["obs"]
+        player1_obs = env._extract_state(sample_player1_state)["obs"]
+        self.assertEqual(len(player0_obs), 78)
+        self.assertEqual(len(player1_obs), 63)
+
 class TestLimitHoldemInfosetEncoder(unittest.TestCase):
+    def test_correct_state_shape(self):
+        self.assertEqual(LimitHoldemInfosetEncoder.STATE_SHAPE, [78])
+
     def test_encode_full_game(self):
         state = {'hand': ['S2', 'S3'], 'public_cards': ['S4', 'S5', 'S6', 'H3', 'H2'], 'player_id': 0}
         action_record = [
@@ -106,6 +132,7 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
             1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
         ])
         result = e.encode(state, action_record)
+        self.assertEqual(len(result), LimitHoldemInfosetEncoder.STATE_SIZE)
         self.assertTrue(np.array_equal(expected_result[0:9], result[0:9]))  # Suits encoded correctly
         self.assertTrue(np.array_equal(expected_result[9:25], result[9:25]))  # Bets encoded correctly
         self.assertTrue(np.array_equal(expected_result[25:], result[25:]))  # Ranks encoded correctly
@@ -172,6 +199,48 @@ class TestLimitHoldemInfosetEncoder(unittest.TestCase):
         expected_result[3] = 1
         result = e.encode(state, [])
         self.assertTrue(np.array_equal(expected_result[:9], result[:9]))  # Bets encoded correctly
+
+class TestNoHoleEncoder(unittest.TestCase):
+    def test_correct_state_shape(self):
+        self.assertEqual(NoHoleEncoder.STATE_SHAPE, [60])
+
+    def test_encoded_vector_has_no_hole_bits(self):
+        state = {'hand': ['S2', 'S3'], 'public_cards': ['S4', 'S5', 'S6', 'H3'], 'player_id': 1}
+        action_record = [
+            [0, 'call'], [1, 'check'],
+            [0, 'check'], [1, 'check'],
+            [0, 'raise']
+        ]
+        e = NoHoleEncoder()
+        expected_result = np.array([
+            # Suits
+            0.,
+            0.,
+            1.,
+            0.,
+            # Bets
+            0., 0., 0., 0.,
+            0., 0., 0., 0.,
+            0., 0., 1., 1.,
+            0., 0., 0., 0.,
+            # Cards
+            0., 0., 1., 1., 1., 0., 0., 0., 0., 0., 0., 0., 0.,
+            0,
+            0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+            0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
+        ])
+        result = e.encode(state, action_record)
+        self.assertEqual(len(result), NoHoleEncoder.STATE_SIZE)
+        self.assertTrue(np.array_equal(expected_result[0:4], result[0:4]))  # Suits encoded correctly
+        self.assertTrue(np.array_equal(expected_result[9:25], result[9:25]))  # Bets encoded correctly
+        self.assertTrue(np.array_equal(expected_result[25:], result[25:]))  # Ranks encoded correctly
+
+# TODO Implement test cases
+class TestNoFlushEncoder(unittest.TestCase):
+    pass
+
+class TestOldLimitHoldemInfosetEncoder(unittest.TestCase):
+    pass
 
 
 if __name__ == '__main__':

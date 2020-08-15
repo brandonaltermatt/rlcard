@@ -18,6 +18,7 @@ if 'torch' in installed_packages:
     from rlcard.agents.nfsp_agent_pytorch import NFSPAgent as NFSPAgentPytorch
 
 from rlcard.agents.cfr_agent import CFRAgent
+from rlcard.agents.cfrplus_agent import CFRPlusAgent
 from rlcard.agents.limit_holdem_human_agent import HumanAgent as LimitholdemHumanAgent
 from rlcard.agents.nolimit_holdem_human_agent import HumanAgent as NolimitholdemHumanAgent
 from rlcard.agents.leduc_holdem_human_agent import HumanAgent as LeducholdemHumanAgent
