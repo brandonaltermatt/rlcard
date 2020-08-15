@@ -6,6 +6,7 @@ class Model(object):
     def __init__(self):
         ''' Load the model here
         '''
+        self.game = None
         pass
 
     @property

@@ -44,9 +44,7 @@ We developed two rule-based agents except the trained agent by CFR algorithm. On
 
 File of agents: [shortlimitholdem_rule_models.py](/rlcard/rlcard/models/shortlimitholdem_rule_models.py)\
 A simple example to play with the rule-based agents: [short_limit_holdem_human.py](/rlcard/examples/short_limit_holdem_human.py)
-A simple statistical that plays more or less agressive based on the cards in their hand: [one_look_agent.py](/rlcard/agents/one_look_agent.py)
-A simple statistical that plays more or less agressive based on the cards in their hand: [one_look_agent.py](/rlcard/agents/one_look_agent.py)
-Agent trys to figure out if their hand is better or worse than "average": [short_limit_holdem_average_andy.py](/rlcard/agents/short_limit_holdem_average_andy.py)
+
 
 ## Expanded limit holdem and short-limit holdem infoset representation
 In order to expand rlcard to meet the various computational needs of training a model, different infoset representations have been created that encode the game's current state for an agent. The goal for these representations is to increase the speed it takes for a model to learn and converge to a strategy, sometimes at the sake of it not performing as well. 

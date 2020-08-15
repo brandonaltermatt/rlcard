@@ -1,10 +1,11 @@
-''' Limit Hold 'em rule model
+''' Short Limit Hold 'em rule model
 '''
 import rlcard
 from rlcard.models.model import Model
 
-class LimitholdemRuleAgentV1(object):
-    ''' Limit Hold 'em Rule agent version 1
+class ShortLimitholdemRuleAgent1(object):
+    ''' Short Limit Hold 'em Rule agent number 1
+		A defensive agent: only raise when it holds good hand cards 
     '''
 
     def __init__(self):
@@ -110,17 +111,45 @@ class LimitholdemRuleAgentV1(object):
         '''
         return self.step(state), []
 
-class LimitholdemRuleModelV1(Model):
-    ''' Limitholdem Rule Model version 1
+class ShortLimitholdemRuleAgent2(object):
+    ''' Short Limit Hold 'em Rule agent number 2
+		An aggressive agent: raise anytime whatever its hand cards are!
     '''
+
+    def __init__(self):
+        self.use_raw = True
+
+    @staticmethod
+    def step(state):
+        legal_actions = state['raw_legal_actions']
+        action = 'raise'
+
+        #return action
+        if action in legal_actions:
+            return action
+        else:
+            if action == 'raise':
+                return 'call'
+            if action == 'check':
+                return 'fold'
+            if action == 'call':
+                return 'raise'
+            else:
+                return action
+
+    def eval_step(self, state):
+        ''' Step for evaluation. The same to step
+        '''
+        return self.step(state), []
+
+
+class ShortLimitholdemRuleModel1(Model):
 
     def __init__(self):
         ''' Load pretrained model
         '''
-        self.game = 'limit-holdem'
-        env = rlcard.make(self.game)
-
-        rule_agent = LimitholdemRuleAgentV1()
+        env = rlcard.make('short-limit-holdem')
+        rule_agent = ShortLimitholdemRuleAgent1()
         self.rule_agents = [rule_agent for _ in range(env.player_num)]
 
     @property
@@ -143,3 +172,34 @@ class LimitholdemRuleModelV1(Model):
             use_raw (boolean): True if using raw state and action
         '''
         return True
+
+class ShortLimitholdemRuleModel2(Model):
+
+    def __init__(self):
+        ''' Load pretrained model
+        '''
+        env = rlcard.make('short-limit-holdem')
+        rule_agent = ShortLimitholdemRuleAgent2()
+        self.rule_agents = [rule_agent for _ in range(env.player_num)]
+
+    @property
+    def agents(self):
+        ''' Get a list of agents for each position in a the game
+
+        Returns:
+            agents (list): A list of agents
+
+        Note: Each agent should be just like RL agent with step and eval_step
+              functioning well.
+        '''
+        return self.rule_agents
+
+    @property
+    def use_raw(self):
+        ''' Indicate whether use raw state and action
+
+        Returns:
+            use_raw (boolean): True if using raw state and action
+        '''
+        return True
+

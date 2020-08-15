@@ -2,25 +2,22 @@ import numpy as np
 from rlcard.agents import RandomAgent
 from rlcard.utils import rank2int
 
-MODES = []
-MODES.append({"fold" : 8, "check" : 5, "call" : 2, "raise" : 1})# conservative
-MODES.append({"fold" : 1, "check" : 1, "call" : 1, "raise" : 1})# neutral
-MODES.append({"fold" : 1, "check" : 3, "call" : 2, "raise" : 8})# agressive
+# Adds weights to how often an action will be made
+CONSERVATIVE_WEIGHTS = {"fold" : 8, "check" : 5, "call" : 2, "raise" : 1}
+NEUTRIAL_WEIGHTS = {"fold" : 8, "check" : 5, "call" : 2, "raise" : 1}
+AGRESSIVE_WEIGHTS = {"fold" : 1, "check" : 3, "call" : 2, "raise" : 8}
+MODES = [CONSERVATIVE_WEIGHTS, NEUTRIAL_WEIGHTS, AGRESSIVE_WEIGHTS]
 
-class OneLookAgent(RandomAgent):
-    ''' Agent looks at his card to start the game, then never looks at the board
+class OneLookAgent(object):
+    ''' Agent looks at it's card to start the game, then never looks at the board
     '''
-    def __init__(self, action_num):
-        ''' Initilize the random agent
-
-        Args:
-            action_num (int): The size of the ouput action space
+    def __init__(self):
+        ''' Stateless implementation
         '''
         self.use_raw = True
-        self.action_num = action_num
 
     @ staticmethod    
-    def getPolicy(self, actions, hand):
+    def getPolicy(actions, hand):
         ''' Based on purely the cards in the player's hand, they will be more likely to make an action.
 
         Args:
@@ -37,15 +34,12 @@ class OneLookAgent(RandomAgent):
         
         # Decide play style based on our hand
         mode = 2
-        if cardScore < 8:
+        if cardScore < 16:
             mode = 0
-        elif cardScore < 16:
+        elif cardScore < 21:
             mode = 1
-        
-        # Decide play style based on hand
-        weights = [MODES[mode][action] for action in actions]  
-        scaler = 1/sum(weights)
-        return [p * scaler for p in weights] 
+
+        return MODES[mode]
 
     @staticmethod
     def step(state):
@@ -59,5 +53,14 @@ class OneLookAgent(RandomAgent):
         '''
         actions = state['raw_obs']['legal_actions']
         hand = state['raw_obs']['hand']
-        probabilites = OneLookAgent.getPolicy(state, actions, hand)
-        return np.random.choice(actions, p=probabilites)
+
+        weights = OneLookAgent.getPolicy(actions, hand)
+        probabilites = [weights[action] for action in actions]  
+        scaler = 1/sum(probabilites)
+        normProbs =  [p * scaler for p in probabilites] 
+        return np.random.choice(actions, p=normProbs)
+
+    def eval_step(self, state):
+        ''' No randomness thrown in, so this is the same as the step function
+        '''
+        return self.step(state), []

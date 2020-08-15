@@ -2,7 +2,6 @@ import numpy as np
 
 from rlcard.core import Card, Player
 
-
 def init_standard_deck():
     ''' Initialize a standard deck of 52 cards
 
@@ -407,4 +406,3 @@ def tournament(env, num):
     for i, _ in enumerate(payoffs):
         payoffs[i] /= counter
     return payoffs
-
