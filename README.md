@@ -32,15 +32,8 @@ python gui.py
 ### More information about GUI
 See [gui.md](/docs/gui.md)
 
-
-## Expansion of CFR Algorithm
-Counterfactional Regret Minimization is a family of learning algorithms for use in games with imperfect information. Traditional learning algorithms such as Mini-max and Q-Learning are unstable in multiagent games with imperfect information. CFR was the first algorithm to achieve super-human performance in full scale poker games, developing a strategy that is capable of bluffing and deception and robust to opponents which are actively attempting to exploit it. It is however very computationally expensive in large poker games (Cepheus, the agent which developed an approximate solution to 2 player limitholdem, trained for 68 days on 4800 CPUs). Much research has been done on developing modifications and optimizations to the original CFR algorithm. The RLCard toolkit includes an implementation of vanilla-CFR, which the project attempts to expand with some of these improvements.
-
-*need new files*
-
-
-## Other Rule-based Agents
-We developed two rule-based agents except the trained agent by CFR algorithm. One agent follows defensivee rules: At the begining, it raises only if its hand cards have "good" combinations (e.g. pairs, a combination from A to 10). After community cards showed, it searches for the best combo between its hand cards and community cards. If the expected flush or straight or triple does  not exist, it will fold. Another agent follows a simple aggressive rule: it raise anytime whatever its hand cards are. 
+## Additional Rule-based Agents
+We developed two additional rule-based agents for Short Limit Holdem. One agent follows defensive rules: At the beginning, it raises only if its hand cards have "good" combinations (e.g. pairs, a combination from A to 10). After community cards are revealed, it searches for the best combo between its hand cards and community cards. If the expected flush or straight or triple does not exist, it will fold. Another agent follows a simple aggressive rule: it raise anytime whatever its hand cards are. 
 
 File of agents: [shortlimitholdem_rule_models.py](/rlcard/rlcard/models/shortlimitholdem_rule_models.py)\
 A simple example to play with the rule-based agents: [short_limit_holdem_human.py](/rlcard/examples/short_limit_holdem_human.py)
